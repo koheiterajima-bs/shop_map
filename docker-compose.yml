@@ -1,0 +1,50 @@
+version: "3.8"
+
+services:
+  app:
+    container_name: shop_map_app
+    build:
+      context: ./backend/build/app
+      dockerfile: Dockerfile
+    tty: true
+    ports: 
+      - 8080:8080
+    env_file:
+      - ./backend/build/db/.env
+    depends_on:
+      - db
+    volumes:
+      - type: bind
+        source: ./backend/build/app/src
+        target: /go/src
+    networks:
+      - shop_map_network
+
+  db:
+    container_name: shop_map_db
+    build:
+      context: ./backend/build/db
+      dockerfile: Dockerfile
+    tty: true
+    platform: linux/x86_64
+    ports:
+      - 3307:3306
+    env_file:
+      - ./backend/build/db/.env
+    volumes:
+      - type: volume
+        source: mysql-data
+        target: /var/lib/mysql
+      # データベース、テーブル初期化(Gorm導入後、.sqlファイルと共に削除)
+      - type: bind
+        source: ./backend/build/db/init
+        target: /docker-entrypoint-initdb.d
+
+volumes:
+  mysql-data:
+    name: user-volume
+
+networks:
+  shop_map_network:
+    external: true
+  
