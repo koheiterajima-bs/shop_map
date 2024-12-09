@@ -48,6 +48,8 @@
     - Gormを導入し、データベース作成の記述を行い、元々ある.sqlファイルとdocker-composeファイルのバインドを削除->完了
     - Ginを使い、HTTPリクエストの記述を行う->完了
     - 暗号化、ミドルウェア部分の記述を行う->
+    - Golangにてリクエストを行い、Flutterの該当ページを表示させたい
+    
     - ログイン機能の実装を行う->
     - bcryptを使ったパスワード認証
 
@@ -59,12 +61,14 @@
 
 - フロントエンド
   - 各画面作成
-    - GoRouterを設定し、画面だけ作成->完了
+    - GoRouterを設定し、画面だけ作成(中身は何も作らない)->完了
+    - ログイン画面作成->完了
   - 各画面の実装
     - Riverpodのインストールと設定->完了
     - ボトムナビゲーションを実装し、各画面に遷移->完了
     - Google Maps API(google_maps_flutter)を使い、画面に地図表示->完了
     現在地を取得し、表示！！！(12/8ここから再開！！！)
+    https://zenn.dev/slowhand/articles/f4e4e092f9b72bから再開！！！
 
 ### 予定
 - 12/4-8の週：ログイン機能の実装、ボトムナビゲーションの作成
@@ -141,6 +145,7 @@ SELECT * FROM users;
 - [[続] go_routerでBottomNavigationBarの永続化に挑戦する(StatefulShellRoute)](https://zenn.dev/flutteruniv_dev/articles/stateful_shell_route)
 - [FlutterアプリにGoogleマップを追加する](https://codelabs.developers.google.com/codelabs/google-maps-in-flutter?hl=ja#2)
 - [【Flutter】Riverpodで使うProviderの種類をわかりやすくまとめてみた](https://qiita.com/yuu1111main/items/285109b3197e1499e0a0)
+- [Flutter】GoogleMap for Flutter あれこれ](https://zenn.dev/slowhand/articles/f4e4e092f9b72b)
 
 ### Backend
 - [docker-composeでgolangとMySQLを繋ぐ](https://zenn.dev/ajapa/articles/443c396a2c5dd1)
