@@ -106,6 +106,14 @@ html
 3.2
 file:///Users/koheiterajima/.pub-cache/hosted/pub.dev/html-0.15.5/
 file:///Users/koheiterajima/.pub-cache/hosted/pub.dev/html-0.15.5/lib/
+http
+3.3
+file:///Users/koheiterajima/.pub-cache/hosted/pub.dev/http-1.2.2/
+file:///Users/koheiterajima/.pub-cache/hosted/pub.dev/http-1.2.2/lib/
+http_parser
+2.12
+file:///Users/koheiterajima/.pub-cache/hosted/pub.dev/http_parser-4.0.2/
+file:///Users/koheiterajima/.pub-cache/hosted/pub.dev/http_parser-4.0.2/lib/
 leak_tracker
 3.2
 file:///Users/koheiterajima/.pub-cache/hosted/pub.dev/leak_tracker-10.0.5/

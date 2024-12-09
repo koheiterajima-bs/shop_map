@@ -182,6 +182,18 @@
       "languageVersion": "3.2"
     },
     {
+      "name": "http",
+      "rootUri": "file:///Users/koheiterajima/.pub-cache/hosted/pub.dev/http-1.2.2",
+      "packageUri": "lib/",
+      "languageVersion": "3.3"
+    },
+    {
+      "name": "http_parser",
+      "rootUri": "file:///Users/koheiterajima/.pub-cache/hosted/pub.dev/http_parser-4.0.2",
+      "packageUri": "lib/",
+      "languageVersion": "2.12"
+    },
+    {
       "name": "leak_tracker",
       "rootUri": "file:///Users/koheiterajima/.pub-cache/hosted/pub.dev/leak_tracker-10.0.5",
       "packageUri": "lib/",
@@ -350,7 +362,7 @@
       "languageVersion": "3.5"
     }
   ],
-  "generated": "2024-12-09T09:15:10.663853Z",
+  "generated": "2024-12-09T14:34:54.538710Z",
   "generator": "pub",
   "generatorVersion": "3.5.3",
   "flutterRoot": "file:///Users/koheiterajima/development/flutter",

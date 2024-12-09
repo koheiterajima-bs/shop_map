@@ -13,3 +13,9 @@ final googleMapControllerProvider =
 // 現在位置からスタートさせたいので、後々非同期にしたい、一旦StateProviderで実装？
 final mapCenterProvider =
     StateProvider<LatLng>((ref) => const LatLng(45.521563, -122.677433));
+
+// ログイン画面にてIDを保持するProvider
+final loginInputIDProvider = StateProvider<String>((ref) => "");
+
+// ログイン画面にてPasswordを保持するProvider
+final loginInputPasswordProvider = StateProvider<String>((ref) => "");
