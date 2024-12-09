@@ -2,43 +2,46 @@
 package model
 
 import (
-	"database/sql"
 	"fmt"
-	"log"
 	"os"
 	"time"
 
 	_ "github.com/go-sql-driver/mysql"
+	"gorm.io/driver/mysql"
+	"gorm.io/gorm"
 )
 
-// MySQLに接続するための関数
-func open(path string, count uint) *sql.DB {
-	db, err := sql.Open("mysql", path)
-	if err != nil {
-		// log.Fatal("open error:", err)
-		log.Println("open error:", err) // エラー詳細を表示
-		log.Fatal("DB接続に失敗しました。")
-	}
+var db *gorm.DB
 
-	// 接続のリトライ機能
-	if err = db.Ping(); err != nil {
-		// 接続に失敗した場合、2秒待機してもう一度接続を試みる
-		time.Sleep(time.Second * 2)
-		count--
-		fmt.Printf("retry... count:%v\n", count)
-		// 再帰的にopen関数を呼び出してリトライする
-		return open(path, count)
+// MySQL初期化(Gormを用いることで、.sqlファイルに初期設定を記述する必要がなくなる)
+func init() {
+	// .envファイルから読み込み
+	user := os.Getenv("MYSQL_USER")
+	password := os.Getenv("MYSQL_PASSWORD")
+	db_name := os.Getenv("MYSQL_DATABASE")
+	// 接続文字列
+	var path string = fmt.Sprintf("%s:%s@tcp(db:3306)/%s?charset=utf8&parseTime=true", user, password, db_name)
+	// データベース接続の定義(MySQL用のgorm.Dialectorを作成)
+	dialector := mysql.Open(path)
+	var err error
+	// Gormがdialectorを使ってデータベースに接続する
+	if db, err = gorm.Open(dialector); err != nil {
+		connect(dialector, 100)
 	}
-
 	fmt.Println("db connected!!")
-	return db
 }
 
-// 接続文字列(Data Source Name)を作成し、open関数を呼び出してMySQLに接続
-func ConnectDB() *sql.DB {
-	// 接続文字列(os.Getenvは環境変数を取得)
-	var path string = fmt.Sprintf("%s:%s@tcp(db:3306)/%s?charset=utf8&parseTime=true",
-		os.Getenv("MYSQL_USER"), os.Getenv("MYSQL_PASSWORD"), os.Getenv("MYSQL_DATABASE"))
-
-	return open(path, 100)
+// エラーが発生し続ける限り再試行を行う
+func connect(dialector gorm.Dialector, count uint) {
+	var err error
+	if db, err = gorm.Open(dialector); err != nil {
+		if count > 1 {
+			time.Sleep(time.Second * 2)
+			count--
+			fmt.Printf("retry... count:%v\n", count)
+			connect(dialector, count)
+			return
+		}
+		panic(err.Error())
+	}
 }

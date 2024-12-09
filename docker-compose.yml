@@ -35,10 +35,8 @@ services:
       - type: volume
         source: mysql-data
         target: /var/lib/mysql
-      # データベース、テーブル初期化(Gorm導入後、.sqlファイルと共に削除)
-      - type: bind
-        source: ./backend/build/db/init
-        target: /docker-entrypoint-initdb.d
+    networks:
+      - shop_map_network
 
 volumes:
   mysql-data:
