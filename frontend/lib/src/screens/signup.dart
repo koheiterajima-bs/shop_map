@@ -1,11 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+import '../providers/provider.dart';
 
 // 新規登録表示
 class SignUpPage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    // Providerから値を受け取る
+    final signupInputID = ref.watch(signupInputIDProvider);
+    final signupInputPassword = ref.watch(signupInputPasswordProvider);
+
     return Scaffold(
       body: Padding(
         padding: EdgeInsets.all(16.0),
@@ -16,15 +23,37 @@ class SignUpPage extends ConsumerWidget {
               Text('新規登録'),
               SizedBox(height: 15),
               TextFormField(
-                decoration: InputDecoration(labelText: 'ID'),
-              ),
+                  // テキスト入力のラベルを設定
+                  decoration: InputDecoration(labelText: 'ID'),
+                  onChanged: (String value) {
+                    // ユーザーの入力をProviderに保存
+                    ref.watch(signupInputIDProvider.notifier).state = value;
+                  }),
               TextFormField(
-                decoration: InputDecoration(labelText: 'パスワード'),
-              ),
+                  // テキスト入力のラベルを設定
+                  decoration: InputDecoration(labelText: 'パスワード'),
+                  onChanged: (String value) {
+                    // ユーザーの入力をProviderに保存
+                    ref.watch(signupInputPasswordProvider.notifier).state =
+                        value;
+                  }),
               SizedBox(height: 20),
               ElevatedButton(
-                onPressed: () {
-                  Text('hoge');
+                onPressed: () async {
+                  try {
+                    await http.post(
+                      Uri.parse('http://localhost:8080/login/signup'),
+                      headers: {'Content-Type': 'application/json'},
+                      body: json.encode({
+                        'user_id': signupInputID,
+                        'password': signupInputPassword
+                      }),
+                    );
+                  } catch (e) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('エラーが発生しました: $e')),
+                    );
+                  }
                 },
                 child: Text('新規登録'),
               ),

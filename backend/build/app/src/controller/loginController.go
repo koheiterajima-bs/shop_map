@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/koheiterajima-bs/shop_map/model"
 )
 
 type LoginData struct {
@@ -23,6 +24,17 @@ func postLogin(c *gin.Context) {
 
 	// 受信したデータをログに表示
 	fmt.Printf("ID: %s, Password: %s\n", input.ID, input.Password)
+
+	// ログイン処理を実施
+	user, err := model.Login(input.ID, input.Password)
+	if err != nil {
+		c.Redirect(301, "/login")
+		return
+	}
+
+	// 出力(後で消す？)
+	fmt.Println(user)
+	fmt.Println("ログインできました！！")
 
 	// レスポンスを返す
 	c.JSON(http.StatusOK, gin.H{

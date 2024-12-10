@@ -46,18 +46,14 @@
     - GolangにてMySQLに接続し、コマンドにMySQLデータ取得->完了
     - GolangのホットリロードAirを導入->完了
     - Gormを導入し、データベース作成の記述を行い、元々ある.sqlファイルとdocker-composeファイルのバインドを削除->完了
+    - 暗号化の実装を行う->完了
     - Ginを使い、HTTPリクエストの記述を行う->完了
+    - user.goに実装してあるログイン・新規登録の実装を使う->完了
 
+    ログインしたら、どこのページに飛ぶか？->新たにページを作る？既存のアプリを参考にしてみる
+    Redisとは、、、というよりMySQLで実装したい、セッション管理をどうするか？->セッション管理ライブラリである(github.com/gin-contrib/sessions)を用いる？
 
-    - 暗号化、ミドルウェア部分の記述を行う->
-    - Golangにてリクエストを行い、Flutterの該当ページを表示させたい
-    
-    - ログイン機能の実装を行う->
-    - bcryptを使ったパスワード認証
-
-    database.goのInitをinitに書き換え、main.goの中はルーティングのみに変える
-    ルーティング、暗号化の実装を行う
-    Redisとは
+    各デバイス、共通のURIにてアクセスできるように実装したい
 
 
   - 投稿機能
@@ -72,8 +68,7 @@
     - Google Maps API(google_maps_flutter)を使い、画面に地図表示->完了
     現在地を取得し、表示！！！(12/8ここから再開！！！)
     https://zenn.dev/slowhand/articles/f4e4e092f9b72bから再開！！！
-
-    - ログイン画面にて、入力したものをGolang側へリクエストを投げる->login.dartができたので、signup.dartも同様にやってみる
+    - ログイン画面にて、入力したものをGolang側へリクエストを投げる->完了
 
 ### 予定
 - 12/4-8の週：ログイン機能の実装、ボトムナビゲーションの作成
@@ -124,9 +119,26 @@
   - デフォルト設定の適用
 - バインドとは
   - プログラムにおいてデータを関連づけること
-
-
-- Redisとは
+- 状態管理とは
+  - 状態とはUIを構築するために必要なデータのこと、状態が変化するとUIが再構築される
+  - 状態には2種類あり、Ephemeral state(ローカル状態)とApp state(共有状態)
+    - Ephemeral stateは、画面間で共有しないなど、スコープが閉じた状態
+    - App Stateは、複数の画面間で共有するなどの状態
+  - StatelessWidgetは、ミュータブルな状態を持たないWidgetであり、静的な画面に使う
+  - StatefulWidgetは、ミュータブルな状態を持つWidget(正確には自分自身はミュータブルな状態を持たず、Stateクラスに状態管理を委ねる、状態変化に応じてウィジェットの再ビルドを行う)
+    - StatefulWidgetでは、あくまでCreateStateメソッドを作成し、その下の抽象クラスにて状態管理を行う
+  - InheritedWidgetは、直近のInheritedWidgetにO(1)(ウィジェットツリー内で最も近いInheritedWidgetに即座にアクセスできる)でアクセスできる、状態の変化を下位ツリーに効率的に伝播できる
+- エミュレータや実機等確認端末が変わっても共通のURIにて実装したい
+  - バックエンドのホスト名を共通化
+    - ローカルネットワークにホスト名を設定する(例: http://my-backend.local:8080/login)
+    - サーバーをクラウド(AWS,GCP,Heroku)にデプロイし、固定ドメインを使用する
+  - ローカルネットワーク内のIPアドレスを自動取得する
+    - Flutterのdart:ioを使うことでネットワーク情報を取得できる
+  - ngrokやCloudflare Tunnelを使用する
+- セッションが必要な理由
+  - ユーザーが誰なのかを特定するため->WebアプリケーションはHTTP通信を使うが、HTTPはステートレス(状態を保持しない)仕組みなため、リクエストがどのユーザーからきたかわからない
+  - ログイン状態を維持するため
+  - 重要なデータを安全に扱うため
 
 
 ## メモ
@@ -146,7 +158,23 @@ SELECT * FROM users;
 ## エラーや悩んだところ
 - コンテナ上のgolangからコンテナ上のMySQLへ接続できない->解決済
   - docker-compose.ymlファイルにて、DBのnetworksの指定の記述が漏れていた
+- 状態管理について、使い方はわかるが、どんなものかよくわかっていない
 - Riverpodの各Providerがどんなときに使うものかわかっていない
+
+## 足りない知識(とりあえず思いつき次第メモ)
+### Frontend
+- 言語仕様、背景
+- 各処理の流れ、仕組み等を1つ1つていねいに抑える
+    - 非同期通信はどう行われるか
+    - Widgetをどう生成しているのか
+    - 状態管理がどう行われているか、各状態管理はどう使い分けるか
+        - StatelessWidgetとStatefulWidgetについての理解が曖昧なままRiverpodに触れているため余計にわかっていない
+- HTTP通信
+
+### Backend
+- ginのHTTP通信のやり方、使い方
+- cryptoを使った暗号化
+- セッションとは、Cookieとは
 
 ## 各参考サイト
 ### Frontend
@@ -155,10 +183,20 @@ SELECT * FROM users;
 - [FlutterアプリにGoogleマップを追加する](https://codelabs.developers.google.com/codelabs/google-maps-in-flutter?hl=ja#2)
 - [【Flutter】Riverpodで使うProviderの種類をわかりやすくまとめてみた](https://qiita.com/yuu1111main/items/285109b3197e1499e0a0)
 - [Flutter】GoogleMap for Flutter あれこれ](https://zenn.dev/slowhand/articles/f4e4e092f9b72b)
+- [Flutterの状態管理の基礎](https://zenn.dev/ueshun/articles/0227f3add1b5b3)
+
+(未読)
+- [「内側」から理解する Flutter 入門](https://zenn.dev/chooyan/books/934f823764db62)
+- [仕組みから理解する Riverpod](https://zenn.dev/chooyan/books/92a0a489f68233)
 
 ### Backend
 - [docker-composeでgolangとMySQLを繋ぐ](https://zenn.dev/ajapa/articles/443c396a2c5dd1)
 - [DockerコンテナでgolangをホットリロードするAirを導入](https://zenn.dev/ajapa/articles/bc399c7e4c0def)
 - [Gorm(golang用ORマッパー)を使う](https://zenn.dev/ajapa/articles/aa9b59dd30c501)
 - [golangフレームワークginを使ってみる](https://zenn.dev/ajapa/articles/6471ac0c612fda)
+- [golangでログイン機能を作る①(bcryptでパスワード暗号化)](https://zenn.dev/ajapa/articles/5b115f53e76f3a)
 - [init関数のふしぎ #golang](https://qiita.com/tenntenn/items/7c70e3451ac783999b4f)
+
+## 今後の展望
+- 各技術の知識を学習(とりあえず実装しましたになっている)
+- HTTP通信ではなく、状態を保持する通信にて実装？(WebSocket、gRPC、TCP/IP？)

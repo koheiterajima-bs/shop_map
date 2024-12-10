@@ -13,7 +13,7 @@ func GetRouter() *gin.Engine {
 	router.POST("/login", postLogin)
 
 	// 新規登録
-	router.POST("/signup", postSignup)
+	router.POST("/login/signup", postSignup)
 
 	// GET:特定のページを見たいと要求するリクエスト
 	// POST:ブラウザからデータをサーバーに送信するときに使う

@@ -19,3 +19,9 @@ final loginInputIDProvider = StateProvider<String>((ref) => "");
 
 // ログイン画面にてPasswordを保持するProvider
 final loginInputPasswordProvider = StateProvider<String>((ref) => "");
+
+// 新規登録画面にてIDを保持するProvider
+final signupInputIDProvider = StateProvider<String>((ref) => "");
+
+// 新規登録画面にてPasswordを保持するProvider
+final signupInputPasswordProvider = StateProvider<String>((ref) => "");
