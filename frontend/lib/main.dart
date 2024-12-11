@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'src/screens/login.dart';
 import 'src/screens/map.dart';
 import 'src/screens/signup.dart';
+import 'src/screens/account.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'src/bottom_menu.dart';
 
@@ -55,6 +56,11 @@ GoRouter router() {
                     GoRoute(
                       path: 'signup',
                       builder: (context, state) => SignUpPage(),
+                    ),
+                    // accountページのネスト
+                    GoRoute(
+                      path: 'account',
+                      builder: (context, state) => AccountPage(),
                     ),
                   ],
                 ),
