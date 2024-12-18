@@ -1,8 +1,12 @@
 package controller
 
 import (
+	"github.com/gin-contrib/sessions"
+	"github.com/gin-contrib/sessions/cookie"
 	"github.com/gin-gonic/gin"
 )
+
+// var LoginInfo SessionInfo
 
 func GetRouter() *gin.Engine {
 	// Ginルーター作成
@@ -15,18 +19,23 @@ func GetRouter() *gin.Engine {
 	// 新規登録
 	router.POST("/login/signup", postSignup)
 
-	// GET:特定のページを見たいと要求するリクエスト
-	// POST:ブラウザからデータをサーバーに送信するときに使う
-	// // トップページ
-	// router.GET("/", getTop)
-
-	// // 新規登録ページ
-	// router.GET("/signup", getSignup)
-	// router.POST("/signup", postSignup)
-
-	// // ログインページ
-	// router.GET("/login", getLogin)
-	// router.POST("/login", postLogin)
+	// セッションの設定
+	store := cookie.NewStore([]byte("secret"))
+	router.Use(sessions.Sessions("mysession", store))
 
 	return router
 }
+
+// セッションチェック
+// func sessionCheck() gin.HandlerFunc {
+// 	return func(c *gin.Context) {
+// 		session := sessions.Default(c)
+// 		LoginInfo.UserId = session.Get("UserId")
+
+// 		// セッションがない場合、ログインフォームを出す
+// 		if LoginInfo.UserId == nil {
+// 			log.Println("ログインしていません")
+
+// 		}
+// 	}
+// }

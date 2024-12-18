@@ -41,7 +41,7 @@ class LoginPage extends ConsumerWidget {
               ElevatedButton(
                 onPressed: () async {
                   try {
-                    await http.post(
+                    final response = await http.post(
                       Uri.parse('http://localhost:8080/login'),
                       headers: {'Content-Type': 'application/json'},
                       body: json.encode({
@@ -49,6 +49,17 @@ class LoginPage extends ConsumerWidget {
                         'password': loginInputPassword
                       }),
                     );
+
+                    // 正常終了時の処理
+                    if (response.statusCode == 200) {
+                      // 遷移先ページに移動
+                      context.go('/login/account');
+                    } else {
+                      // サーバーからエラーが返ってきた場合
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text('サーバーエラー: ${response.body}')),
+                      );
+                    }
                   } catch (e) {
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(content: Text('エラーが発生しました: $e')),
