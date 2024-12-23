@@ -10,9 +10,37 @@ final googleMapControllerProvider =
     StateProvider<GoogleMapController?>((ref) => null);
 
 // マップの初期位置の状態管理
-// 現在位置からスタートさせたいので、後々非同期にしたい、一旦StateProviderで実装？
-final mapCenterProvider =
-    StateProvider<LatLng>((ref) => const LatLng(45.521563, -122.677433));
+final mapCenterProvider = StateProvider<LatLng>(
+    (ref) => const LatLng(35.68021168333, 139.7576692371));
+
+// 現在位置を取得するプロバイダー
+final currentLocationProvider = FutureProvider<LatLng>((ref) async {
+  // 位置情報サービスの許可をリクエスト
+  bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+  if (!serviceEnabled) {
+    throw Exception("位置情報サービスが無効です");
+  }
+
+  // 権限のリクエスト
+  LocationPermission permission = await Geolocator.checkPermission();
+  if (permission == LocationPermission.denied) {
+    permission = await Geolocator.requestPermission();
+    if (permission == LocationPermission.denied) {
+      throw Exception("位置情報の権限が拒否されました");
+    }
+  }
+
+  if (permission == LocationPermission.deniedForever) {
+    throw Exception("位置情報の権限が永久に拒否されています");
+  }
+
+  // 現在位置を取得
+  Position position = await Geolocator.getCurrentPosition();
+  return LatLng(position.latitude, position.longitude);
+});
+
+// 現在のマーカーセットを管理するプロバイダー
+final markersProvider = StateProvider<Set<Marker>>((ref) => {});
 
 // ログイン画面にてIDを保持するProvider
 final loginInputIDProvider = StateProvider<String>((ref) => "");

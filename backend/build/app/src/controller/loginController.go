@@ -17,6 +17,7 @@ func postLogin(c *gin.Context) {
 	var input LoginData
 
 	// リクエストのデータをバインド
+	// Flutterのフォームから送信されたリクエストボディー(JSON形式)を構造体にバインド
 	if err := c.ShouldBindJSON(&input); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
@@ -36,9 +37,13 @@ func postLogin(c *gin.Context) {
 	fmt.Println(user)
 	fmt.Println("ログインできました！！")
 
+	// Redisにセッションを登録し、Cookieをセット
+	cookieKey := "LOGIN_USER_ID_KEY"         // Cookieのキー名
+	model.NewSession(c, cookieKey, input.ID) // input.IDをRedisに保存
+
 	// レスポンスを返す
 	c.JSON(http.StatusOK, gin.H{
-		"message": "Data received successfully!",
-		"data":    input,
+		"message": "ログインに成功しました!",
+		"user":    user,
 	})
 }

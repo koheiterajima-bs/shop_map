@@ -17,6 +17,7 @@ func postSignup(c *gin.Context) {
 	var input SignupData
 
 	// リクエストのデータをバインド
+	// Flutterのフォームから送信されたリクエストボディー(JSON形式)を構造体にバインド
 	if err := c.ShouldBindJSON(&input); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
@@ -35,6 +36,10 @@ func postSignup(c *gin.Context) {
 	// 出力(後で消す？)
 	fmt.Println(user)
 	fmt.Println("新規登録できました！！！")
+
+	// Redisにセッションを登録し、Cookieをセット
+	cookieKey := "LOGIN_USER_ID_KEY"         // Cookieのキー名
+	model.NewSession(c, cookieKey, input.ID) // input.IDをRedisに保存
 
 	// レスポンスを返す
 	c.JSON(http.StatusOK, gin.H{

@@ -10,7 +10,7 @@ import 'src/bottom_menu.dart';
 void main() {
   runApp(
     // Riverpodでデータを受け渡しできる状態にする
-    ProviderScope(child: ShopMapApp()),
+    const ProviderScope(child: ShopMapApp()),
   );
 }
 

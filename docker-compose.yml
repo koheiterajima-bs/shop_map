@@ -11,8 +11,10 @@ services:
       - 8080:8080
     env_file:
       - ./backend/build/db/.env
+      - ./backend/build/app/.env
     depends_on:
       - db
+      - redis
     volumes:
       - type: bind
         source: ./backend/build/app/src
@@ -35,6 +37,14 @@ services:
       - type: volume
         source: mysql-data
         target: /var/lib/mysql
+    networks:
+      - shop_map_network
+
+  redis:
+    container_name: redis
+    image: redis:latest
+    ports:
+      - 6379:6379
     networks:
       - shop_map_network
 
