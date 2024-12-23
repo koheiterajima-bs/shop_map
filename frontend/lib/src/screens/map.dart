@@ -13,6 +13,22 @@ class MapPage extends ConsumerWidget {
     // 現在のマーカーセットを取得
     final markers = ref.watch(markersProvider);
 
+    // ドロップダウンの選択肢(何系のガチャガチャが多いか)
+    Map<String, String> dropDownMap01 = {
+      "1": "キャラ",
+      "2": "ミニチュア",
+      "3": "マニアック"
+    };
+
+    // ドロップダウンの選択肢(何台程度あるか)
+    Map<String, String> dropDownMap02 = {
+      "1": "0〜10台",
+      "2": "11〜50台",
+      "3": "51〜100台",
+      "4": "それ以上"
+    };
+    String? selectedValue; // 選択された値を保持する変数
+
     return Scaffold(
       body: currentLocationAsync.when(
         data: (currentLocation) {
@@ -29,7 +45,7 @@ class MapPage extends ConsumerWidget {
             },
             initialCameraPosition: CameraPosition(
               target: currentLocation,
-              zoom: 11.0,
+              zoom: 18.0,
             ),
             myLocationEnabled: true, // 現在位置をマップ上に表示
             markers: markers,
@@ -59,6 +75,71 @@ class MapPage extends ConsumerWidget {
                 );
                 return {...currentMarkers, newMarker};
               });
+
+              // マーカーを追加後にモーダルを表示
+              showModalBottomSheet(
+                  context: context,
+                  showDragHandle: true,
+                  isScrollControlled: true,
+                  builder: (BuildContext context) {
+                    return Container(
+                      width: MediaQuery.of(context).size.width,
+                      padding: const EdgeInsets.all(16.0),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            "緯度： ${position.latitude}",
+                          ),
+                          Text(
+                            "経度： ${position.longitude}",
+                          ),
+                          TextField(
+                            decoration: InputDecoration(
+                              hintText: "店名を入力してください",
+                              border: OutlineInputBorder(),
+                            ),
+                          ),
+                          SizedBox(height: 8),
+                          DropdownButton(
+                              value: selectedValue, // 現在選択されている値
+                              items: dropDownMap01.entries.map((entry) {
+                                return DropdownMenuItem(
+                                  value: entry.key, // Mapのキーを値として設定
+                                  child:
+                                      Text(entry.value), // Mapの値を表示するテキストとして設定
+                                );
+                              }).toList(),
+                              onChanged: (String? value) {
+                                Text("ドロップダウンのメニュー");
+                              }),
+                          SizedBox(height: 8),
+                          DropdownButton(
+                              value: selectedValue, // 現在選択されている値
+                              items: dropDownMap02.entries.map((entry) {
+                                return DropdownMenuItem(
+                                  value: entry.key,
+                                  child: Text(entry.value),
+                                );
+                              }).toList(),
+                              onChanged: (String? value) {
+                                Text("ドロップダウンのメニュー");
+                              }),
+                          CheckboxListTile(
+                            title: Text("両替機がある"),
+                            value: false,
+                            onChanged: (bool? value) {
+                              Text("チェックが入りました");
+                            },
+                            activeColor: Colors.green,
+                            checkColor: Colors.red,
+                          ),
+                          SizedBox(height: 8),
+                        ],
+                      ),
+                    );
+                  });
             },
           );
         },
