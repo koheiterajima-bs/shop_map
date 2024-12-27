@@ -1,7 +1,9 @@
 package controller
 
 import (
+	"fmt"
 	"net/http"
+	"os"
 
 	"github.com/gin-gonic/gin"
 	"github.com/koheiterajima-bs/shop_map/model"
@@ -10,7 +12,8 @@ import (
 // セッションを確認するエンドポイント
 func checkSession(c *gin.Context) {
 	// クライアントから送信されたCookieを取得
-	cookieKey := "LOGIN_USER_ID_KEY"
+	cookieKey := os.Getenv("LOGIN_USER_ID_KEY")
+	fmt.Printf("%sがCookieKeyです\n", cookieKey)
 	sessionValue := model.GetSession(c, cookieKey)
 
 	if sessionValue == nil {

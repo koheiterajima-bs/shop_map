@@ -3,6 +3,7 @@ package controller
 import (
 	"fmt"
 	"net/http"
+	"os"
 
 	"github.com/gin-gonic/gin"
 	"github.com/koheiterajima-bs/shop_map/model"
@@ -29,7 +30,8 @@ func postSignup(c *gin.Context) {
 	// 新規登録処理を実施
 	user, err := model.Signup(input.ID, input.Password)
 	if err != nil {
-		c.Redirect(301, "/login")
+		fmt.Println("新規登録できませんでした")
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
@@ -38,7 +40,8 @@ func postSignup(c *gin.Context) {
 	fmt.Println("新規登録できました！！！")
 
 	// Redisにセッションを登録し、Cookieをセット
-	cookieKey := "LOGIN_USER_ID_KEY"         // Cookieのキー名
+	cookieKey := os.Getenv("LOGIN_USER_ID_KEY") // Cookieのキー名
+	fmt.Println(cookieKey)
 	model.NewSession(c, cookieKey, input.ID) // input.IDをRedisに保存
 
 	// レスポンスを返す

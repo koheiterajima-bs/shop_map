@@ -24,9 +24,44 @@ class AccountPage extends StatelessWidget {
             return Scaffold();
           } else {
             return Scaffold(
-              body: Padding(
-                padding: EdgeInsets.all(16.0),
-                child: Text('これはアカウントページです'),
+              body: Center(
+                child: Padding(
+                  padding: EdgeInsets.all(16.0),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text('アカウントページ'),
+                      SizedBox(height: 15),
+                      ElevatedButton(
+                          onPressed: () async {
+                            try {
+                              final response = await http.post(
+                                Uri.parse('http://localhost:8080/logout'),
+                                // Uri.parse('http://172.16.0.57:8080/logout'),
+                              );
+
+                              // 正常終了時の処理
+                              if (response.statusCode == 200) {
+                                // ログインページに移動
+                                context.go('/login');
+                              } else {
+                                // サーバーからエラーが返ってきた場合
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                      content:
+                                          Text('サーバーエラー: ${response.body}')),
+                                );
+                              }
+                            } catch (e) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(content: Text('エラーが発生しました: $e')),
+                              );
+                            }
+                          },
+                          child: Text('ログアウト')),
+                    ],
+                  ),
+                ),
               ),
             );
           }

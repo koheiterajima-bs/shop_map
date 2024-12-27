@@ -6,6 +6,7 @@ import (
 	"encoding/base64"
 	"fmt"
 	"io"
+	"net/http"
 
 	"github.com/gin-gonic/gin"
 	"github.com/go-redis/redis"
@@ -39,13 +40,26 @@ func NewSession(c *gin.Context, cookieKey, redisValue string) {
 		panic("Session登録時にエラーが発生:" + err.Error())
 	}
 	// クライアントにCookieをセット(ブラウザ側)
-	c.SetCookie(cookieKey, newRedisKey, 0, "/", "localhost", false, false)
+	// c.SetCookie(cookieKey, newRedisKey, 0, "/", "localhost", false, false)
+	// c.SetCookie(cookieKey, newRedisKey, 0, "/", "172.16.0.57", false, false)
+	c.SetCookie(cookieKey, newRedisKey, 0, "/", "", false, false)
+	fmt.Println("Redis key:", newRedisKey)
+	fmt.Println("Redis value:", redisValue)
 }
 
 // セッションデータを取得する関数
 func GetSession(c *gin.Context, cookieKey string) interface{} {
 	// CookieからRedisのキーを取得(クライアントから送られたCookieを取得)
-	redisKey, _ := c.Cookie(cookieKey)
+	redisKey, err := c.Cookie(cookieKey)
+	if err != nil {
+		if err != nil {
+			if err == http.ErrNoCookie {
+				fmt.Println("Cookieが存在しません:", cookieKey)
+			} else {
+				fmt.Println("Cookie取得時にエラーが発生しました:", err.Error())
+			}
+		}
+	}
 
 	// Redisからセッションデータを取得(クライアントから取得したCookieKeyを用い、サーバーから保存されている値を取得)
 	redisValue, err := conn.Get(redisKey).Result()
@@ -63,10 +77,22 @@ func GetSession(c *gin.Context, cookieKey string) interface{} {
 
 // セッションを削除する関数
 func DeleteSession(c *gin.Context, cookieKey string) {
-	// Redisのキーを削除(サーバーからデータを削除)
-	redisId, _ := c.Cookie(cookieKey)
-	conn.Del(redisId)
+	// CookieからセッションIDを取得
+	redisId, err := c.Cookie(cookieKey)
+	if err != nil {
+		// Cookieが存在しない場合はログアウト済み
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Cookieが見つかりません"})
+		return
+	}
+
+	// Redisからセッションを削除
+	err = conn.Del(redisId).Err()
+	if err != nil {
+		// Redis削除時にエラーが発生した場合
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "セッション削除に失敗しました"})
+		return
+	}
 
 	// Cookieを削除(クライアント側)
-	c.SetCookie(cookieKey, "", -1, "/", "localhost", false, false)
+	c.SetCookie(cookieKey, "", -1, "/", "", false, false)
 }

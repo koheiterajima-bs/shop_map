@@ -18,5 +18,8 @@ func GetRouter() *gin.Engine {
 	// FlutterからリクエストされたGETエンドポイントを設定
 	router.GET("/check-session", checkSession)
 
+	// ログアウト
+	router.POST("/logout", postLogout)
+
 	return router
 }

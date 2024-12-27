@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 import '../providers/provider.dart';
 
 // マップ表示
@@ -13,21 +15,18 @@ class MapPage extends ConsumerWidget {
     // 現在のマーカーセットを取得
     final markers = ref.watch(markersProvider);
 
-    // ドロップダウンの選択肢(何系のガチャガチャが多いか)
-    Map<String, String> dropDownMap01 = {
-      "1": "キャラ",
-      "2": "ミニチュア",
-      "3": "マニアック"
-    };
+    // ボトムモーダルの状態を取得
+    final bottomModalActive = ref.watch(bottomModalActiveProvider);
 
-    // ドロップダウンの選択肢(何台程度あるか)
-    Map<String, String> dropDownMap02 = {
-      "1": "0〜10台",
-      "2": "11〜50台",
-      "3": "51〜100台",
-      "4": "それ以上"
-    };
-    String? selectedValue; // 選択された値を保持する変数
+    // チップの選択状態を取得
+    final filterChip01 = ref.watch(filterChipProvider01);
+    final filterChip02 = ref.watch(filterChipProvider02);
+
+    // 入力の値を受け取る
+    final shopName = ref.watch(shopNameProvider);
+    final genre = ref.watch(genreProvider);
+    final unit = ref.watch(unitProvider);
+    final exchangeMachine = ref.watch(exchangeMachineProvider);
 
     return Scaffold(
       body: currentLocationAsync.when(
@@ -49,7 +48,17 @@ class MapPage extends ConsumerWidget {
             ),
             myLocationEnabled: true, // 現在位置をマップ上に表示
             markers: markers,
+            // モーダルの表示時にはマップ操作を無効
+            scrollGesturesEnabled: !bottomModalActive,
+            zoomControlsEnabled: !bottomModalActive,
+            rotateGesturesEnabled: !bottomModalActive,
+            tiltGesturesEnabled: !bottomModalActive,
             onTap: (LatLng position) {
+              // ボトムモーダルの状態を確認(trueの場合はマップのタップを無効に)
+              if (bottomModalActive) {
+                return;
+              }
+
               // マーカーが既に存在しているか確認
               if (markers.any(
                   (marker) => _isSameLocation(marker.position, position))) {
@@ -76,6 +85,9 @@ class MapPage extends ConsumerWidget {
                 return {...currentMarkers, newMarker};
               });
 
+              // モーダル表示時にボトムモーダルをアクティブにする
+              ref.read(bottomModalActiveProvider.notifier).state = true;
+
               // マーカーを追加後にモーダルを表示
               showModalBottomSheet(
                   context: context,
@@ -89,57 +101,118 @@ class MapPage extends ConsumerWidget {
                         mainAxisSize: MainAxisSize.min,
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(
-                            "緯度： ${position.latitude}",
-                          ),
-                          Text(
-                            "経度： ${position.longitude}",
-                          ),
+                          // Text(
+                          //   "緯度： ${position.latitude}",
+                          // ),
+                          // Text(
+                          //   "経度： ${position.longitude}",
+                          // ),
+                          Center(child: Text("ガチャガチャ場所の登録")),
+                          SizedBox(height: 8),
                           TextField(
-                            decoration: InputDecoration(
-                              hintText: "店名を入力してください",
-                              border: OutlineInputBorder(),
+                              decoration: InputDecoration(
+                                hintText: "店名を入力してください",
+                                border: OutlineInputBorder(),
+                              ),
+                              onChanged: (String value) {
+                                // ユーザーの入力をProviderに保存
+                                ref.watch(shopNameProvider.notifier).state =
+                                    value;
+                              }),
+                          SizedBox(height: 8),
+                          Text("何のガチャが多いか？"),
+                          Container(
+                            width: MediaQuery.of(context).size.width,
+                            padding: const EdgeInsets.all(8.0),
+                            child: Wrap(
+                              spacing: 8,
+                              runSpacing: 8,
+                              children: List.generate(
+                                choices01.length,
+                                (index) {
+                                  return FilterChip(
+                                    showCheckmark: true,
+                                    label: Text(choices01[index]),
+                                    onSelected: (value) {
+                                      // Providerを使って状態を更新
+                                      ref
+                                          .watch(filterChipProvider01.notifier)
+                                          .toggleSelection(index);
+                                    },
+                                    selected: filterChip01[index],
+                                  );
+                                },
+                              ),
                             ),
                           ),
                           SizedBox(height: 8),
-                          DropdownButton(
-                              value: selectedValue, // 現在選択されている値
-                              items: dropDownMap01.entries.map((entry) {
-                                return DropdownMenuItem(
-                                  value: entry.key, // Mapのキーを値として設定
-                                  child:
-                                      Text(entry.value), // Mapの値を表示するテキストとして設定
-                                );
-                              }).toList(),
-                              onChanged: (String? value) {
-                                Text("ドロップダウンのメニュー");
-                              }),
-                          SizedBox(height: 8),
-                          DropdownButton(
-                              value: selectedValue, // 現在選択されている値
-                              items: dropDownMap02.entries.map((entry) {
-                                return DropdownMenuItem(
-                                  value: entry.key,
-                                  child: Text(entry.value),
-                                );
-                              }).toList(),
-                              onChanged: (String? value) {
-                                Text("ドロップダウンのメニュー");
-                              }),
+                          Text("ガチャ台数"),
+                          Container(
+                            width: MediaQuery.of(context).size.width,
+                            padding: const EdgeInsets.all(8.0),
+                            child: Wrap(
+                              spacing: 8,
+                              runSpacing: 8,
+                              children: List.generate(
+                                choices02.length,
+                                (index) {
+                                  return FilterChip(
+                                    showCheckmark: true,
+                                    label: Text(choices02[index]),
+                                    onSelected: (value) {
+                                      Text("hoge");
+                                    },
+                                    selected: filterChip02[index],
+                                  );
+                                },
+                              ),
+                            ),
+                          ),
                           CheckboxListTile(
                             title: Text("両替機がある"),
-                            value: false,
+                            value: exchangeMachine,
                             onChanged: (bool? value) {
-                              Text("チェックが入りました");
+                              if (value != null) {
+                                ref
+                                    .watch(exchangeMachineProvider.notifier)
+                                    .state = value;
+                              }
                             },
                             activeColor: Colors.green,
                             checkColor: Colors.red,
                           ),
                           SizedBox(height: 8),
+                          Center(
+                            child: ElevatedButton(
+                              onPressed: () async {
+                                try {
+                                  final response = await http.post(
+                                    Uri.parse(
+                                        'http://localhost:8080/registeringlocation'),
+                                    // Uri.parse('http://172.16.0.57:8080/registeringlocation'),
+                                    headers: {
+                                      'Content-Type': 'application/json'
+                                    },
+                                    body: json.encode({
+                                      'shop_name': shopName,
+                                      'genre': genre,
+                                      'unit': unit,
+                                      'exchange_machine': exchangeMachine,
+                                    }),
+                                  );
+                                } catch (e) {
+                                  Text("これはエラーですわ");
+                                }
+                              },
+                              child: Text("場所を登録する"),
+                            ),
+                          ),
                         ],
                       ),
                     );
-                  });
+                  }).whenComplete(() {
+                ref.read(bottomModalActiveProvider.notifier).state = false;
+              });
             },
           );
         },
