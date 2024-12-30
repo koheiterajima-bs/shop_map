@@ -94,7 +94,7 @@ class MapPage extends ConsumerWidget {
                         final exchangeMachine =
                             ref.watch(exchangeMachineProvider);
 
-                        // 入力の値を受け取る(必要？？)
+                        // フォーム入力の値を取得
                         final shopName = ref.watch(shopNameProvider);
                         final genre = ref.watch(genreProvider);
                         final unit = ref.watch(unitProvider);
@@ -191,6 +191,25 @@ class MapPage extends ConsumerWidget {
                                 child: ElevatedButton(
                                   onPressed: () async {
                                     try {
+                                      // 何系のガチャが多いかのチェックされたリストを取得
+                                      final selectedChoices01 = filterChip01
+                                          .asMap()
+                                          .entries
+                                          .where((entry) =>
+                                              entry.value) // trueの項目のみをフィルタ
+                                          .map((entry) => choices01[
+                                              entry.key]) // 該当する選択肢を取得
+                                          .toList();
+
+                                      // ガチャ台数は何台かのチェックされたリストを取得
+                                      // final selectedChoices02 = filterChip02.asMap().
+                                      print(shopName);
+                                      print(filterChip01);
+                                      print(filterChip02);
+                                      print(exchangeMachine);
+
+                                      print(selectedChoices01);
+
                                       final response = await http.post(
                                         Uri.parse(
                                             'http://localhost:8080/registeringlocation'),
@@ -216,122 +235,6 @@ class MapPage extends ConsumerWidget {
                           ),
                         );
                       },
-                      // width: MediaQuery.of(context).size.width,
-                      // padding: const EdgeInsets.all(16.0),
-                      // child: Column(
-                      //   mainAxisSize: MainAxisSize.min,
-                      //   crossAxisAlignment: CrossAxisAlignment.start,
-                      //   children: [
-                      //     // Text(
-                      //     //   "緯度： ${position.latitude}",
-                      //     // ),
-                      //     // Text(
-                      //     //   "経度： ${position.longitude}",
-                      //     // ),
-                      //     Center(child: Text("ガチャガチャ場所の登録")),
-                      //     SizedBox(height: 8),
-                      //     TextField(
-                      //         decoration: InputDecoration(
-                      //           hintText: "店名を入力してください",
-                      //           border: OutlineInputBorder(),
-                      //         ),
-                      //         onChanged: (String value) {
-                      //           // ユーザーの入力をProviderに保存
-                      //           ref.watch(shopNameProvider.notifier).state =
-                      //               value;
-                      //         }),
-                      //     SizedBox(height: 8),
-                      //     Text("何のガチャが多いか？"),
-                      //     Container(
-                      //       width: MediaQuery.of(context).size.width,
-                      //       padding: const EdgeInsets.all(8.0),
-                      //       child: Wrap(
-                      //         spacing: 8,
-                      //         runSpacing: 8,
-                      //         children: List.generate(
-                      //           choices01.length,
-                      //           (index) {
-                      //             return FilterChip(
-                      //               showCheckmark: true,
-                      //               label: Text(choices01[index]),
-                      //               onSelected: (value) {
-                      //                 // Providerを使って状態を更新
-                      //                 ref
-                      //                     .watch(filterChipProvider01.notifier)
-                      //                     .toggleSelection(index);
-                      //               },
-                      //               selected: filterChip01[index],
-                      //             );
-                      //           },
-                      //         ),
-                      //       ),
-                      //     ),
-                      //     SizedBox(height: 8),
-                      //     Text("ガチャ台数"),
-                      //     Container(
-                      //       width: MediaQuery.of(context).size.width,
-                      //       padding: const EdgeInsets.all(8.0),
-                      //       child: Wrap(
-                      //         spacing: 8,
-                      //         runSpacing: 8,
-                      //         children: List.generate(
-                      //           choices02.length,
-                      //           (index) {
-                      //             return FilterChip(
-                      //               showCheckmark: true,
-                      //               label: Text(choices02[index]),
-                      //               onSelected: (value) {
-                      //                 Text("hoge");
-                      //               },
-                      //               selected: filterChip02[index],
-                      //             );
-                      //           },
-                      //         ),
-                      //       ),
-                      //     ),
-                      //     CheckboxListTile(
-                      //       title: Text("両替機がある"),
-                      //       value: exchangeMachine,
-                      //       onChanged: (bool? value) {
-                      //         if (value != null) {
-                      //           ref
-                      //               .watch(exchangeMachineProvider.notifier)
-                      //               .state = value;
-                      //           // デバッグコンソールにメッセージを表示
-                      //           print("両替機の状態が変更されました: $value");
-                      //         }
-                      //       },
-                      //       activeColor: Colors.green,
-                      //       checkColor: Colors.white,
-                      //     ),
-                      //     SizedBox(height: 8),
-                      //     Center(
-                      //       child: ElevatedButton(
-                      //         onPressed: () async {
-                      //           try {
-                      //             final response = await http.post(
-                      //               Uri.parse(
-                      //                   'http://localhost:8080/registeringlocation'),
-                      //               // Uri.parse('http://172.16.0.57:8080/registeringlocation'),
-                      //               headers: {
-                      //                 'Content-Type': 'application/json'
-                      //               },
-                      //               body: json.encode({
-                      //                 'shop_name': shopName,
-                      //                 'genre': genre,
-                      //                 'unit': unit,
-                      //                 'exchange_machine': exchangeMachine,
-                      //               }),
-                      //             );
-                      //           } catch (e) {
-                      //             Text("これはエラーですわ");
-                      //           }
-                      //         },
-                      //         child: Text("場所を登録する"),
-                      //       ),
-                      //     ),
-                      //   ],
-                      // ),
                     );
                   }).whenComplete(() {
                 ref.watch(bottomModalActiveProvider.notifier).state = false;
