@@ -71,6 +71,11 @@ class FilterChipNotifier01 extends StateNotifier<List<bool>> {
   void toggleSelection(int index) {
     state = List.from(state)..[index] = !state[index];
   }
+
+  // 状態をリセットするメソッド
+  void reset() {
+    state = List.generate(choices01.length, (index) => false);
+  }
 }
 
 // チップの選択肢(何系のガチャガチャが多いか)
@@ -86,9 +91,17 @@ class FilterChipNotifier02 extends StateNotifier<List<bool>> {
   FilterChipNotifier02()
       : super(List.generate(choices02.length, (index) => false));
 
-  // 選択状態を切り替えるメソッド
+  // 選択状態を切り替えるメソッド(いずれか1つだけ選択可能)
   void toggleSelection(int index) {
-    state = List.from(state)..[index] = !state[index];
+    state = List.generate(
+      state.length,
+      (i) => i == index ? !state[i] : false, // 選択されたindexだけを切り替え(一致した場合には反転させる)
+    );
+  }
+
+  // 状態をリセットするメソッド
+  void reset() {
+    state = List.generate(choices02.length, (index) => false);
   }
 }
 
@@ -105,4 +118,13 @@ final genreProvider = StateProvider<String>((ref) => "");
 final unitProvider = StateProvider<String>((ref) => "");
 
 // 両替機の有無を保持するProvider
-final exchangeMachineProvider = StateProvider<bool>((ref) => false);
+final AutoDisposeStateProvider<bool> exchangeMachineProvider =
+    StateProvider.autoDispose((ref) {
+  return false;
+});
+
+// 以下テスト用
+final AutoDisposeStateProvider<bool> isCheckedProvider =
+    StateProvider.autoDispose((ref) {
+  return false;
+});
