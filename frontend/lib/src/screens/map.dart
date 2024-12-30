@@ -96,8 +96,6 @@ class MapPage extends ConsumerWidget {
 
                         // フォーム入力の値を取得
                         final shopName = ref.watch(shopNameProvider);
-                        final genre = ref.watch(genreProvider);
-                        final unit = ref.watch(unitProvider);
 
                         return Padding(
                           padding: const EdgeInsets.all(16.0),
@@ -138,7 +136,8 @@ class MapPage extends ConsumerWidget {
                                                   filterChipProvider01.notifier)
                                               .toggleSelection(index);
                                         },
-                                        selected: filterChip01[index],
+                                        // nullを防ぎ、falseを返す
+                                        selected: filterChip01[index] ?? false,
                                       );
                                     },
                                   ),
@@ -165,7 +164,8 @@ class MapPage extends ConsumerWidget {
                                                   filterChipProvider02.notifier)
                                               .toggleSelection(index);
                                         },
-                                        selected: filterChip02[index],
+                                        // nullを防ぎ、falseを返す
+                                        selected: filterChip02[index] ?? false,
                                       );
                                     },
                                   ),
@@ -192,23 +192,52 @@ class MapPage extends ConsumerWidget {
                                   onPressed: () async {
                                     try {
                                       // 何系のガチャが多いかのチェックされたリストを取得
-                                      final selectedChoices01 = filterChip01
-                                          .asMap()
-                                          .entries
-                                          .where((entry) =>
-                                              entry.value) // trueの項目のみをフィルタ
-                                          .map((entry) => choices01[
-                                              entry.key]) // 該当する選択肢を取得
-                                          .toList();
+                                      final selectedChoices01 = ref
+                                          .watch(filterChipProvider01.notifier)
+                                          .getSelectedChoices();
 
                                       // ガチャ台数は何台かのチェックされたリストを取得
-                                      // final selectedChoices02 = filterChip02.asMap().
-                                      print(shopName);
-                                      print(filterChip01);
-                                      print(filterChip02);
-                                      print(exchangeMachine);
+                                      final selectedChoices02 = ref
+                                          .watch(filterChipProvider02.notifier)
+                                          .getSelectedChoices();
 
-                                      print(selectedChoices01);
+                                      // デバッグ用
+                                      print("緯度:${position.latitude}");
+                                      print("経度:${position.longitude}");
+                                      print("お店の名前:$shopName");
+                                      print("両替機の有無:$exchangeMachine");
+                                      print("何系のガチャが多いか:$selectedChoices01");
+                                      print("ガチャ台数は何台か:$selectedChoices02");
+
+                                      // 入力漏れがあれば通知を行う
+                                      if (shopName == "") {
+                                        ScaffoldMessenger.of(context)
+                                            .showSnackBar(
+                                          SnackBar(
+                                            content: Text("店名を入力してください"),
+                                          ),
+                                        );
+                                        return;
+                                      }
+                                      if (selectedChoices01.isEmpty) {
+                                        ScaffoldMessenger.of(context)
+                                            .showSnackBar(
+                                          SnackBar(
+                                            content:
+                                                Text("何系のガチャが多いかにチェックを入れてください"),
+                                          ),
+                                        );
+                                        return;
+                                      }
+                                      if (selectedChoices02.isEmpty) {
+                                        ScaffoldMessenger.of(context)
+                                            .showSnackBar(
+                                          SnackBar(
+                                            content:
+                                                Text("ガチャの台数にチェックを入れてください"),
+                                          ),
+                                        );
+                                      }
 
                                       final response = await http.post(
                                         Uri.parse(
@@ -218,14 +247,36 @@ class MapPage extends ConsumerWidget {
                                           'Content-Type': 'application/json'
                                         },
                                         body: json.encode({
+                                          'lat': position.latitude,
+                                          'lng': position.longitude,
                                           'shop_name': shopName,
-                                          'genre': genre,
-                                          'unit': unit,
+                                          'genre': selectedChoices01,
+                                          'unit': selectedChoices02,
                                           'exchange_machine': exchangeMachine,
                                         }),
                                       );
+
+                                      // 正常終了時の処理
+                                      if (response.statusCode == 200) {
+                                        ScaffoldMessenger.of(context)
+                                            .showSnackBar(
+                                          SnackBar(content: Text("場所を登録できました")),
+                                        );
+                                      } else {
+                                        // サーバーからエラーが返ってきた場合
+                                        ScaffoldMessenger.of(context)
+                                            .showSnackBar(
+                                          SnackBar(
+                                              content: Text(
+                                                  "サーバーエラー: ${response.body}")),
+                                        );
+                                      }
                                     } catch (e) {
-                                      Text("これはエラーですわ");
+                                      ScaffoldMessenger.of(context)
+                                          .showSnackBar(
+                                        SnackBar(
+                                            content: Text('エラーが発生しました: $e')),
+                                      );
                                     }
                                   },
                                   child: Text("場所を登録する"),

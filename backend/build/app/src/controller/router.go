@@ -15,11 +15,14 @@ func GetRouter() *gin.Engine {
 	// 新規登録
 	router.POST("/login/signup", postSignup)
 
-	// FlutterからリクエストされたGETエンドポイントを設定
-	router.GET("/check-session", checkSession)
-
 	// ログアウト
 	router.POST("/logout", postLogout)
+
+	// ガチャ場所の登録
+	router.POST("/registeringlocation", postRegisteringLocation)
+
+	// FlutterからリクエストされたGETエンドポイントを設定
+	router.GET("/check-session", checkSession)
 
 	return router
 }

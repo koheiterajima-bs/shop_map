@@ -59,22 +59,36 @@ final bottomModalActiveProvider = StateProvider<bool>((ref) => false);
 
 // FilterChip01の選択状態を管理するProvider
 final filterChipProvider01 =
-    StateNotifierProvider<FilterChipNotifier01, List<bool>>((ref) {
+    StateNotifierProvider<FilterChipNotifier01, Map<int, bool>>((ref) {
   return FilterChipNotifier01();
 });
 
-class FilterChipNotifier01 extends StateNotifier<List<bool>> {
+class FilterChipNotifier01 extends StateNotifier<Map<int, bool>> {
   FilterChipNotifier01()
-      : super(List.generate(choices01.length, (index) => false));
+      : super(Map.fromEntries(List.generate(
+            choices01.length, (index) => MapEntry(index, false))));
 
   // 選択状態を切り替えるメソッド
   void toggleSelection(int index) {
-    state = List.from(state)..[index] = !state[index];
+    state = {
+      ...state,
+      index: !(state[index] ?? false),
+    };
   }
 
   // 状態をリセットするメソッド
   void reset() {
-    state = List.generate(choices01.length, (index) => false);
+    state = Map.fromEntries(
+      List.generate(choices01.length, (index) => MapEntry(index, false)),
+    );
+  }
+
+  // 選択されている項目を取得するメソッド
+  List<String> getSelectedChoices() {
+    return state.entries
+        .where((entry) => entry.value)
+        .map((entry) => choices01[entry.key])
+        .toList();
   }
 }
 
@@ -83,25 +97,36 @@ List<String> choices01 = ["キャラ", "ミニチュア", "マニアック"];
 
 // FliterChip02の選択状態を管理するProvider
 final filterChipProvider02 =
-    StateNotifierProvider<FilterChipNotifier02, List<bool>>((ref) {
+    StateNotifierProvider<FilterChipNotifier02, Map<int, bool>>((ref) {
   return FilterChipNotifier02();
 });
 
-class FilterChipNotifier02 extends StateNotifier<List<bool>> {
+class FilterChipNotifier02 extends StateNotifier<Map<int, bool>> {
   FilterChipNotifier02()
-      : super(List.generate(choices02.length, (index) => false));
+      : super(Map.fromEntries(List.generate(
+            choices02.length, (index) => MapEntry(index, false))));
 
   // 選択状態を切り替えるメソッド(いずれか1つだけ選択可能)
   void toggleSelection(int index) {
-    state = List.generate(
-      state.length,
-      (i) => i == index ? !state[i] : false, // 選択されたindexだけを切り替え(一致した場合には反転させる)
-    );
+    state = {
+      for (var key in state.keys)
+        key: key == index, // 選択されたindexをtrue、それ以外をfalse
+    };
   }
 
   // 状態をリセットするメソッド
   void reset() {
-    state = List.generate(choices02.length, (index) => false);
+    state = Map.fromEntries(
+      List.generate(choices02.length, (index) => MapEntry(index, false)),
+    );
+  }
+
+  // 選択されている項目を取得するメソッド
+  List<String> getSelectedChoices() {
+    return state.entries
+        .where((entry) => entry.value)
+        .map((entry) => choices02[entry.key])
+        .toList();
   }
 }
 
