@@ -262,6 +262,8 @@ class MapPage extends ConsumerWidget {
                                             .showSnackBar(
                                           SnackBar(content: Text("場所を登録できました")),
                                         );
+                                        // showModalBottomSheetを閉じる
+                                        Navigator.pop(context);
                                       } else {
                                         // サーバーからエラーが返ってきた場合
                                         ScaffoldMessenger.of(context)
