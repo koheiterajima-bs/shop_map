@@ -4,6 +4,7 @@ import 'src/screens/login.dart';
 import 'src/screens/map.dart';
 import 'src/screens/signup.dart';
 import 'src/screens/account.dart';
+import 'src/screens/howtouse.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'src/bottom_menu.dart';
 
@@ -18,6 +19,7 @@ void main() {
 final rootNavigatorKey = GlobalKey<NavigatorState>();
 final mapNavigatorKey = GlobalKey<NavigatorState>(debugLabel: 'map');
 final loginNavigatorKey = GlobalKey<NavigatorState>(debugLabel: 'login');
+final howToUseNavigatorKey = GlobalKey<NavigatorState>(debugLabel: 'howtouse');
 
 // GoRouterの設定
 GoRouter router() {
@@ -66,6 +68,15 @@ GoRouter router() {
                 ),
               ],
             ),
+            StatefulShellBranch(
+              navigatorKey: howToUseNavigatorKey,
+              routes: [
+                GoRoute(
+                  path: '/howtouse',
+                  builder: (context, state) => HowToUsePage(),
+                ),
+              ],
+            ),
           ]),
     ],
   );
@@ -79,7 +90,7 @@ class ShopMapApp extends StatelessWidget {
     return MaterialApp.router(
       debugShowCheckedModeBanner: false,
       // アプリ名
-      title: 'マップアプリ',
+      title: 'ガチャ場所検索アプリ',
       theme: ThemeData(
         // テーマカラー
         primarySwatch: Colors.amber,

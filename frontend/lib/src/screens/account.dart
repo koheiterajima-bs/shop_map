@@ -11,6 +11,9 @@ class AccountPage extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final bool isChecked = ref.watch(isCheckedProvider);
 
+    // StreamProviderテスト用
+    final counterStream = ref.watch(counterStreamProvider);
+
     return FutureBuilder(
         future: _checkSession(), // セッション確認APIを呼び出し
         builder: (context, snapshot) {
@@ -79,6 +82,16 @@ class AccountPage extends ConsumerWidget {
                               },
                             ),
                           ],
+                        ),
+                      ),
+                      Center(
+                        child: counterStream.when(
+                          data: (count) => Text(
+                            'カウント: $count 秒',
+                            style: TextStyle(fontSize: 24),
+                          ),
+                          loading: () => CircularProgressIndicator(),
+                          error: (error, stack) => Text('エラー: $error'),
                         ),
                       ),
                     ],

@@ -60,6 +60,9 @@ docker-compose up -d
     - router.goに登録のメソッドを設定->完了
     - 場所の登録操作を実装->完了
     - データベースを実装し、フロントから来たデータを保存->完了
+  
+  - ガチャ場所をフロント側に返す
+    - 
 
 
 
@@ -88,13 +91,20 @@ docker-compose up -d
     - フォームの各入力を必須にする->完了
     - フォームの内容をバックエンド側に投げる->完了
     - フォーム入力を終えたら、フォームを閉じる->完了
+    - StreamProviderを用い、データベースのデータを常に監視する->
+
+    - StreamProviderの使い方を学ぶ
 
 
-    - 登録したものをマップ上に表示する！！！！(12/31ここから再開！！！)
+    - 登録したものをマップ上に表示する！！！！(1/3 ここから再開！！！)
+    - GitHubにてpublicにする際、googlemapのIDを非公開にするには？
+
+
     - ログイン状態でのみ、登録可能にする
 
     (使い方ページ)
-    - 1/1ここから再開！！！！
+    - ナビゲーションバーに使い方ページを追加->完了
+    - 
 
     (ログインページ)
     - ログイン画面にて、入力したものをGolang側へリクエストを投げる->完了
@@ -107,13 +117,6 @@ docker-compose up -d
 
      linterをつける
 
-
-
-      <!-- - そもそもマップ自体をタップできないようにしたい、現状だとマーカーは無効になるが、マップの操作はできてしまう
-      - マップの操作は無効にした、フォームを送信できるように実装中
-      - フォームを閉じた際に入力項目がリセットされるように実装
-      チェックボックスがチェックを入れてもチェックが入らない(12/28ここから再開！！！)
-      - モーダル内だからチェックがはいらないのか？確かめる->アカウントページにテストでチェックボックスを入れたら機能した、アカウントページと比較してみる -->
 
     - ログインで何ができるかをはっきりさせる
       - 場所の登録が可能
@@ -217,6 +220,8 @@ docker-compose up -d
 - showModalBottomSheetの中で状態変化を検知する
   - showModalBottomSheetを実行すると、元々のツリー配下ではなく、別のツリーとして構築されてしまう
   - そのため、Comsumerで定義されたProviderにアクセスできず、変更を受け取れない
+- ポーリング
+  - クライアント側からサーバー側に対して一定間隔でHTTPリクエストを行う方式のこと
 
 
 ## メモ
@@ -271,6 +276,7 @@ SELECT * FROM users;
 - [【Flutter】GoogleMapの表示からgeolocatorで現在地を取得まで](https://zenn.dev/wakanao/articles/3820bcd67e4130)
 - [【Flutter】checkboxの状態管理をいろんなパターンで試す](https://zenn.dev/tsukatsuka1783/articles/checkbox_handling)
 - [showModalBottomSheetの中でStateNotifierProviderの変更を受け取る](https://qiita.com/jp7eph/items/d7d92b43a368ae0a2a21)
+- [【Flutter】Flutterで使いたいアイコンを探す方法](https://zenn.dev/tama8021/articles/dbc931e23120bb)
 
 (未読)
 - [「内側」から理解する Flutter 入門](https://zenn.dev/chooyan/books/934f823764db62)
@@ -288,3 +294,4 @@ SELECT * FROM users;
 ## 今後の展望
 - 各技術の知識を深掘り学習(とりあえず実装しましたになっている)
 - HTTP通信ではなく、状態を保持する通信にて実装？(WebSocket、gRPC、TCP/IP？)
+  - WebSocketを使用すれば、リアルタイム更新が可能
