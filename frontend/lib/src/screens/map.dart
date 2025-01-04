@@ -13,7 +13,7 @@ class MapPage extends ConsumerWidget {
     final currentLocationAsync = ref.watch(currentLocationProvider);
 
     // 現在のマーカーセットを取得
-    final markers = ref.watch(markersProvider);
+    // final markers = ref.watch(markersProvider);
 
     // ボトムモーダルの状態を取得
     final bottomModalActive = ref.watch(bottomModalActiveProvider);
@@ -40,7 +40,14 @@ class MapPage extends ConsumerWidget {
               zoom: 18.0,
             ),
             myLocationEnabled: true, // 現在位置をマップ上に表示
-            markers: markers,
+            // markers: markers,
+            markers: markerStream.when(
+              data: (markers) {
+                return markers;
+              },
+              loading: () => {},
+              error: (error, stack) => {},
+            ),
             // モーダルの表示時にはマップ操作を無効
             scrollGesturesEnabled: !bottomModalActive,
             zoomControlsEnabled: !bottomModalActive,
@@ -52,31 +59,24 @@ class MapPage extends ConsumerWidget {
                 return;
               }
 
-              // マーカーが既に存在しているか確認
-              if (markers.any(
-                  (marker) => _isSameLocation(marker.position, position))) {
-                // 既に存在している場合は追加しない
+              // マーカーが既に存在しているかの確認
+              final markersExist = markerStream.maybeWhen(
+                data: (markers) {
+                  return markers.any(
+                      (marker) => _isSameLocation(marker.position, position));
+                },
+                orElse: () => false,
+              );
+
+              if (markersExist) {
+                // 既に存在している場合はモーダルを表示しない
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
                     content: Text("既にこの位置にマーカーがあります"),
                   ),
                 );
-                return;
+                return; // 処理を終了
               }
-
-              // マーカーを追加
-              ref.read(markersProvider.notifier).update((currentMarkers) {
-                final newMarker = Marker(
-                  markerId: MarkerId(position.toString()),
-                  position: position,
-                  infoWindow: InfoWindow(
-                    title: "New Marker",
-                    snippet:
-                        "Lat: ${position.latitude}, Lng: ${position.longitude}",
-                  ),
-                );
-                return {...currentMarkers, newMarker};
-              });
 
               // モーダル表示時にボトムモーダルをアクティブにする
               ref.read(bottomModalActiveProvider.notifier).state = true;

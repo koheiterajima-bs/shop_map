@@ -14,6 +14,9 @@ class AccountPage extends ConsumerWidget {
     // StreamProviderテスト用
     final counterStream = ref.watch(counterStreamProvider);
 
+    // flavor確認用
+    const flavor = String.fromEnvironment('flavor');
+
     return FutureBuilder(
         future: _checkSession(), // セッション確認APIを呼び出し
         builder: (context, snapshot) {
@@ -39,6 +42,7 @@ class AccountPage extends ConsumerWidget {
                     children: [
                       Text('アカウントページ'),
                       SizedBox(height: 15),
+                      Text(flavor),
                       ElevatedButton(
                           onPressed: () async {
                             try {

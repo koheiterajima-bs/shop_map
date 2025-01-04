@@ -93,16 +93,7 @@ docker-compose up -d
     - フォームの各入力を必須にする->完了
     - フォームの内容をバックエンド側に投げる->完了
     - フォーム入力を終えたら、フォームを閉じる->完了
-    - StreamProviderを用い、ポーリングにより、バックエンドから一定時間ごとにマーカーを取得->
-
-    - providerにポーリングにてバックエンドから取得してくる実装書く
-    - map.dartに
-
-
-
-    - 登録したものをマップ上に表示する！！！！(1/3 ここから再開！！！)
-    - GitHubにてpublicにする際、googlemapのIDを非公開にするには？
-
+    - StreamProviderを用い、ポーリングにより、バックエンドから一定時間ごとにマーカーを取得->完了
 
     - ログイン状態でのみ、登録可能にする
 
@@ -115,7 +106,27 @@ docker-compose up -d
     - アカウントページの作成と新規登録、ログイン画面からアカウントページへ飛ぶルーティング->完了
     - アカウントページをログイン状態でないとアクセスできないようにする->完了
 
+    (全体)
+    - GitHubにてPublicにするため、Google Maps APIキーを隠蔽したい
+      - 
+```
+flutter run --dart-define-from-file=frontend/dart_defines/dev.env
+Connected devices:
+macOS (desktop)                 • macos                 • darwin-arm64   • macOS 15.1.1 24B91 darwin-arm64
+Mac Designed for iPad (desktop) • mac-designed-for-ipad • darwin         • macOS 15.1.1 24B91 darwin-arm64
+Chrome (web)                    • chrome                • web-javascript • Google Chrome 131.0.6778.205
 
+Checking for wireless devices...
+
+[1]: macOS (macos)
+[2]: Mac Designed for iPad (mac-designed-for-ipad)
+[3]: Chrome (chrome)
+Please choose one (or "q" to quit): 3
+Did not find the file passed to "--dart-define-from-file". Path: frontend/dart_defines/dev.env
+```
+
+
+    シミュレーターだとなぜか現在地を取得してくれない(実機だと現在地になる)
 
      フォーム入力を途中でやめたら、マーカーを消す！！！
 
@@ -226,6 +237,8 @@ docker-compose up -d
   - そのため、Comsumerで定義されたProviderにアクセスできず、変更を受け取れない
 - ポーリング
   - クライアント側からサーバー側に対して一定間隔でHTTPリクエストを行う方式のこと
+- StreamProvider
+  - maybeWhen:特定の状態での処理を定義し、それ以外ではorElseで指定したデフォルト値を返す
 
 
 ## メモ
@@ -281,9 +294,10 @@ SELECT * FROM users;
 - [【Flutter】checkboxの状態管理をいろんなパターンで試す](https://zenn.dev/tsukatsuka1783/articles/checkbox_handling)
 - [showModalBottomSheetの中でStateNotifierProviderの変更を受け取る](https://qiita.com/jp7eph/items/d7d92b43a368ae0a2a21)
 - [【Flutter】Flutterで使いたいアイコンを探す方法](https://zenn.dev/tama8021/articles/dbc931e23120bb)
+- [【Flutter】環境ごとのAPIキーをiOS/Androidネイティブ側に設定する【Google Maps API】](https://zenn.dev/altiveinc/articles/flutter-set-native-api-keys-per-env)
+- [【Flutter 3.19対応】Dart-define-from-fileを使って開発環境と本番環境を分ける](https://zenn.dev/altiveinc/articles/separating-environments-in-flutter)
 
 (未読)
-- [【Flutter】環境ごとのAPIキーをiOS/Androidネイティブ側に設定する【Google Maps API】](https://zenn.dev/altiveinc/articles/flutter-set-native-api-keys-per-env)
 - [「内側」から理解する Flutter 入門](https://zenn.dev/chooyan/books/934f823764db62)
 - [仕組みから理解する Riverpod](https://zenn.dev/chooyan/books/92a0a489f68233)
 - [【Flutter】コマンド一発でスプラッシュ画面を実装する【flutter_native_splash】](https://zenn.dev/susatthi/articles/20220406-061305-flutter-native-splash)

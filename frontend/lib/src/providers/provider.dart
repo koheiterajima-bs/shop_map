@@ -167,6 +167,10 @@ final markerStreamProvider = StreamProvider<Set<Marker>>((ref) async* {
 
       // マーカーリストを生成
       final markers = locations.map((location) {
+        final details = [
+          "ジャンル: ${location["Genre"]}",
+          "両替機の有無: ${location["ExchangeMachine"]}",
+        ];
         return Marker(
           markerId: MarkerId(location["ID"].toString()),
           position: LatLng(
@@ -175,7 +179,7 @@ final markerStreamProvider = StreamProvider<Set<Marker>>((ref) async* {
           ),
           infoWindow: InfoWindow(
             title: location["ShopName"],
-            snippet: "ジャンル: ${location["Genre"]}",
+            snippet: details.join("<br>"),
           ),
         );
       }).toSet();
@@ -187,9 +191,9 @@ final markerStreamProvider = StreamProvider<Set<Marker>>((ref) async* {
   }
 });
 
-final markersProvider = StateProvider<Set<Marker>>((ref) {
-  return {};
-});
+// final markersProvider = StateProvider<Set<Marker>>((ref) {
+//   return ref.watch(markerStreamProvider);
+// });
 
 // 以下テスト用(後で消す)
 // account.dartに記載
