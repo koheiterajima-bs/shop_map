@@ -22,7 +22,11 @@ func GetRouter() *gin.Engine {
 	router.POST("/registeringlocation", postRegisteringLocation)
 
 	// FlutterからリクエストされたGETエンドポイントを設定
+	// セッション確認
 	router.GET("/check-session", checkSession)
+
+	// MySQLに保存されたマーカー取得
+	router.GET("/get-marker", getMarker)
 
 	return router
 }

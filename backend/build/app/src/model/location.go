@@ -60,3 +60,12 @@ func toJSONString(data []string) string {
 	jsonData, _ := json.Marshal(data)
 	return string(jsonData)
 }
+
+// 場所の取得の処理
+func GetAllLocations() ([]Location, error) {
+	var locations []Location
+	if err := db.Find(&locations).Error; err != nil {
+		return nil, err
+	}
+	return locations, nil
+}

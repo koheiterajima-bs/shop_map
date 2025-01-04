@@ -148,6 +148,9 @@ final AutoDisposeStateProvider<bool> exchangeMachineProvider =
   return false;
 });
 
+// バックエンドから取得してきたマーカー情報をポーリングにて取得
+// final markerStreamProvider = StreamProvider<List<Marker>>
+
 // 以下テスト用(後で消す)
 // account.dartに記載
 final AutoDisposeStateProvider<bool> isCheckedProvider =

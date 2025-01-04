@@ -94,6 +94,48 @@ class AccountPage extends ConsumerWidget {
                           error: (error, stack) => Text('エラー: $error'),
                         ),
                       ),
+                      SizedBox(height: 15),
+                      ElevatedButton(
+                        onPressed: () async {
+                          try {
+                            final response = await http.get(
+                              Uri.parse('http://localhost:8080/get-marker'),
+                              // Uri.parse('http://172.16.0.57:8080/get-marker'),
+                            );
+
+                            // 正常終了時の処理
+                            if (response.statusCode == 200) {
+                              // レスポンスボディをパースして表示
+                              // print("レスポンスデータ: ${response.body}");
+
+                              // レスポンスデータ全体をデコード
+                              final responseData = jsonDecode(response.body);
+
+                              // location配列を取得
+                              final locations =
+                                  responseData['location'] as List;
+
+                              // 各locationからShopNameのみを抽出
+                              final ShopNameList = locations
+                                  .map((location) => location['ShopName'])
+                                  .toList();
+
+                              print("取得したShopのリスト: $ShopNameList");
+                            } else {
+                              // サーバーからエラーが返ってきた場合
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                    content: Text('サーバーエラー: ${response.body}')),
+                              );
+                            }
+                          } catch (e) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text("エラーが発生しました: $e")),
+                            );
+                          }
+                        },
+                        child: Text("マーカー全件取得"),
+                      ),
                     ],
                   ),
                 ),
