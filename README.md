@@ -95,6 +95,9 @@ docker-compose up -d
     - フォーム入力を終えたら、フォームを閉じる->完了
     - StreamProviderを用い、ポーリングにより、バックエンドから一定時間ごとにマーカーを取得->
 
+    - providerにポーリングにてバックエンドから取得してくる実装書く
+    - map.dartに
+
 
 
     - 登録したものをマップ上に表示する！！！！(1/3 ここから再開！！！)
@@ -280,6 +283,7 @@ SELECT * FROM users;
 - [【Flutter】Flutterで使いたいアイコンを探す方法](https://zenn.dev/tama8021/articles/dbc931e23120bb)
 
 (未読)
+- [【Flutter】環境ごとのAPIキーをiOS/Androidネイティブ側に設定する【Google Maps API】](https://zenn.dev/altiveinc/articles/flutter-set-native-api-keys-per-env)
 - [「内側」から理解する Flutter 入門](https://zenn.dev/chooyan/books/934f823764db62)
 - [仕組みから理解する Riverpod](https://zenn.dev/chooyan/books/92a0a489f68233)
 - [【Flutter】コマンド一発でスプラッシュ画面を実装する【flutter_native_splash】](https://zenn.dev/susatthi/articles/20220406-061305-flutter-native-splash)

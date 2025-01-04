@@ -115,6 +115,8 @@ class AccountPage extends ConsumerWidget {
                               final locations =
                                   responseData['location'] as List;
 
+                              print(locations);
+
                               // 各locationからShopNameのみを抽出
                               final ShopNameList = locations
                                   .map((location) => location['ShopName'])

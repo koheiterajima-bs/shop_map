@@ -18,6 +18,9 @@ class MapPage extends ConsumerWidget {
     // ボトムモーダルの状態を取得
     final bottomModalActive = ref.watch(bottomModalActiveProvider);
 
+    // バックエンドから取得してきたマーカー情報をポーリングにて取得
+    final markerStream = ref.watch(markerStreamProvider);
+
     return Scaffold(
       body: currentLocationAsync.when(
         data: (currentLocation) {

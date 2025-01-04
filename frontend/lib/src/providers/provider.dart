@@ -1,3 +1,5 @@
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
@@ -40,7 +42,7 @@ final currentLocationProvider = FutureProvider<LatLng>((ref) async {
 });
 
 // 現在のマーカーセットを管理するプロバイダー
-final markersProvider = StateProvider<Set<Marker>>((ref) => {});
+// final markersProvider = StateProvider<Set<Marker>>((ref) => {});
 
 // ログイン画面にてIDを保持するProvider
 final loginInputIDProvider = StateProvider<String>((ref) => "");
@@ -149,7 +151,45 @@ final AutoDisposeStateProvider<bool> exchangeMachineProvider =
 });
 
 // バックエンドから取得してきたマーカー情報をポーリングにて取得
-// final markerStreamProvider = StreamProvider<List<Marker>>
+final markerStreamProvider = StreamProvider<Set<Marker>>((ref) async* {
+  while (true) {
+    await Future.delayed(Duration(seconds: 5)); // 5秒ごとにリクエスト
+    final response = await http.get(
+      Uri.parse('http://localhost:8080/get-marker'),
+      // Uri.parse('http://172.16.0.57:8080/get-marker'),
+    );
+    if (response.statusCode == 200) {
+      // レスポンスデータ全体をデコード
+      final responseData = jsonDecode(response.body);
+
+      // location配列を取得
+      final locations = responseData["location"] as List;
+
+      // マーカーリストを生成
+      final markers = locations.map((location) {
+        return Marker(
+          markerId: MarkerId(location["ID"].toString()),
+          position: LatLng(
+            location["Lat"] as double,
+            location["Lng"] as double,
+          ),
+          infoWindow: InfoWindow(
+            title: location["ShopName"],
+            snippet: "ジャンル: ${location["Genre"]}",
+          ),
+        );
+      }).toSet();
+
+      yield markers;
+    } else {
+      throw Exception("Failed to load markers");
+    }
+  }
+});
+
+final markersProvider = StateProvider<Set<Marker>>((ref) {
+  return {};
+});
 
 // 以下テスト用(後で消す)
 // account.dartに記載
