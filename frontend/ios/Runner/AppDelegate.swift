@@ -10,7 +10,9 @@ import GoogleMaps
   ) -> Bool {
     GeneratedPluginRegistrant.register(with: self)
 
-    GMSServices.provideAPIKey("AIzaSyB7zbk32pT8jpxDEEA5HNWhjOycUmKLKz4")
+    if let googleMapApiKey = Bundle.main.infoDictionary?["Google Maps API Key"] as? String {
+      GMSServices.provideAPIKey(googleMapApiKey)
+    }
 
     return super.application(application, didFinishLaunchingWithOptions: launchOptions)
   }

@@ -12,11 +12,16 @@
 
 ## 起動方法
 ```sh
+# frontend/dart_definesディレクトリを作成し、dev.envを作成(中身の記述は別途共有いたします)
+
 # コンテナ作成と起動
 docker-compose up -d
 
-# main.dartにてアプリ起動
-# 現状、Chromeのシミュレータにて起動をお願いします
+# frontendディレクトリに変更
+flutter run -d {指定のエミュレータ} --dart-define-from-file=dart_defines/dev.env
+
+# iOSについては、以下参照のご確認をお願いいたします(Xcodeの設定)
+https://zenn.dev/altiveinc/articles/separating-environments-in-flutter#xcode%E3%81%AEbuild-pre-actions-%E3%81%AB%E4%BD%9C%E6%88%90%E3%81%97%E3%81%9F%E3%82%B9%E3%82%AF%E3%83%AA%E3%83%97%E3%83%88%E3%82%92%E7%99%BB%E9%8C%B2%E3%81%99%E3%82%8B
 ```
 
 ### なぜ作ろうと思ったか
@@ -128,9 +133,7 @@ Did not find the file passed to "--dart-define-from-file". Path: frontend/dart_d
 
     シミュレーターだとなぜか現在地を取得してくれない(実機だと現在地になる)
 
-     フォーム入力を途中でやめたら、マーカーを消す！！！
-
-     linterをつける
+     linterをつける(1/4ここから再開！！！)
 
 
     - ログインで何ができるかをはっきりさせる
@@ -239,7 +242,8 @@ Did not find the file passed to "--dart-define-from-file". Path: frontend/dart_d
   - クライアント側からサーバー側に対して一定間隔でHTTPリクエストを行う方式のこと
 - StreamProvider
   - maybeWhen:特定の状態での処理を定義し、それ以外ではorElseで指定したデフォルト値を返す
-
+- CocoaPods
+  - iOSおよびmacOSアプリケーションの開発におけるライブラリや依存関係を管理するためのツール
 
 ## メモ
 - viewディレクトリ：HTMLファイルを格納
@@ -265,7 +269,39 @@ SELECT * FROM users;
   - もしかして、Cookieをうまくやり取りできていない？(ブラウザだと問題なし)
   - redis.goのNewSessionにてCookieをサーバーとブラウザにセット
   - redis.goのGetSessionにてCookieは引数にはちゃんと入っているが、おそらくそもそもCookieに登録できていない
+- Androidエミュレータだと、現在地を取得できない？
+  - エミュレータの画面から場所を指定することはできるが、、
+  [Androidエミュレータで位置情報設定術](https://note.com/danchi_kun/n/nd4203ca7e64b)
+- iOSエミュレータが立ち上がらなくなった
+  [Flutter: Failed to launch iOS Simulator: Error: Emulator didn't connect within 60 seconds](https://qiita.com/ucan-lab/items/c50899ceaf099aa8c30f)
+- pod installでhttpでクローンしているのに、sshでクローンしようとして、クローン元がhttpしか対応していないので、エラーになる
+  ```sh
+  # 以下にてgitの設定を見ると、
+  git config --global --list
 
+  url.https://.insteadof=git://
+  url.https://github.com/.insteadof=git@github.com:
+  # これらの記述から変換されていたと考えられる
+
+  # また、以下の設定にも記述があった
+  nano ~/.gitconfig
+  ```
+- CocoaPodsにて、エラー
+[[!] CocoaPods did not set the base configuration of your project because your project already has a custom config set. の解決法](https://qiita.com/kokogento/items/c2979542a34610925e2d)
+- iOSアプリがビルドエラーになる
+  - XcodeにてBuild Pre-actionsのスクリプト登録の際、Provide build settings fromの部分を選択していなかった
+```
+flutter run -d 821C1104-BCAD-462D-8E43-A202EBE587B7 --dart-define-from-file=dart_defines/dev.env
+Launching lib/main.dart on iPhone SE (3rd generation) in debug mode...
+Running Xcode build...                                                  
+Xcode build done.                                            1.2s
+Failed to build iOS app
+Uncategorized (Xcode): Exited with status code 127
+
+
+Could not build the application for the simulator.
+Error launching application on iPhone SE (3rd generation).
+```
 
 ## 足りない知識(とりあえず思いつき次第メモ)
 ### Frontend
@@ -296,6 +332,7 @@ SELECT * FROM users;
 - [【Flutter】Flutterで使いたいアイコンを探す方法](https://zenn.dev/tama8021/articles/dbc931e23120bb)
 - [【Flutter】環境ごとのAPIキーをiOS/Androidネイティブ側に設定する【Google Maps API】](https://zenn.dev/altiveinc/articles/flutter-set-native-api-keys-per-env)
 - [【Flutter 3.19対応】Dart-define-from-fileを使って開発環境と本番環境を分ける](https://zenn.dev/altiveinc/articles/separating-environments-in-flutter)
+- [FlutterアプリにGoogleマップを追加する](https://codelabs.developers.google.com/codelabs/google-maps-in-flutter?hl=ja#2)
 
 (未読)
 - [「内側」から理解する Flutter 入門](https://zenn.dev/chooyan/books/934f823764db62)
