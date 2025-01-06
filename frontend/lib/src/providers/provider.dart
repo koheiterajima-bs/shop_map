@@ -155,8 +155,10 @@ final markerStreamProvider = StreamProvider<Set<Marker>>((ref) async* {
   while (true) {
     await Future.delayed(Duration(seconds: 5)); // 5秒ごとにリクエスト
     final response = await http.get(
-      Uri.parse('http://localhost:8080/get-marker'),
+      // Uri.parse('http://localhost:8080/get-marker'),
       // Uri.parse('http://172.16.0.57:8080/get-marker'),
+      // Androidエミュレータ
+      Uri.parse('http://10.0.2.2:8080/get-marker'),
     );
     if (response.statusCode == 200) {
       // レスポンスデータ全体をデコード

@@ -47,8 +47,10 @@ class AccountPage extends ConsumerWidget {
                           onPressed: () async {
                             try {
                               final response = await http.post(
-                                Uri.parse('http://localhost:8080/logout'),
+                                // Uri.parse('http://localhost:8080/logout'),
                                 // Uri.parse('http://172.16.0.57:8080/logout'),
+                                // Androidエミュレータ
+                                Uri.parse('http://10.0.2.2:8080/logout'),
                               );
 
                               // 正常終了時の処理
@@ -103,8 +105,10 @@ class AccountPage extends ConsumerWidget {
                         onPressed: () async {
                           try {
                             final response = await http.get(
-                              Uri.parse('http://localhost:8080/get-marker'),
+                              // Uri.parse('http://localhost:8080/get-marker'),
                               // Uri.parse('http://172.16.0.57:8080/get-marker'),
+                              // Androidエミュレータ
+                              Uri.parse('http://10.0.2.2:8080/get-marker'),
                             );
 
                             // 正常終了時の処理
@@ -238,10 +242,12 @@ class AccountPage extends ConsumerWidget {
 // セッション確認APIを呼び出す関数
 Future<bool> _checkSession() async {
   try {
-    final response =
-        await http.get(Uri.parse('http://localhost:8080/check-session'),
-            // Uri.parse('http://172.16.0.57:8080/check-session'),
-            headers: {'Content-Type': 'application/json'});
+    final response = await http.get(
+        // Uri.parse('http://localhost:8080/check-session'),
+        // Uri.parse('http://172.16.0.57:8080/check-session'),
+        // Androidエミュレータ
+        Uri.parse('http://10.0.2.2:8080/check-session'),
+        headers: {'Content-Type': 'application/json'});
 
     if (response.statusCode == 200) {
       final responseData = json.decode(response.body);

@@ -112,8 +112,9 @@ https://zenn.dev/altiveinc/articles/separating-environments-in-flutter#xcode%E3%
     - アカウントページをログイン状態でないとアクセスできないようにする->完了
 
     (全体)
-    - GitHubにてPublicにするため、Google Maps APIキーを隠蔽したい
-      - 
+    - GitHubにてPublicにするため、Google Maps APIキーを隠蔽したい->完了
+    - Android/iOSエミュレータを起動できるようにする->完了
+ 
 ```
 flutter run --dart-define-from-file=frontend/dart_defines/dev.env
 Connected devices:
@@ -269,12 +270,15 @@ SELECT * FROM users;
   - もしかして、Cookieをうまくやり取りできていない？(ブラウザだと問題なし)
   - redis.goのNewSessionにてCookieをサーバーとブラウザにセット
   - redis.goのGetSessionにてCookieは引数にはちゃんと入っているが、おそらくそもそもCookieに登録できていない
+
+- localhostではなく、Androidエミュレータのポートである「10.0.2.2」を使えば、場所の登録はできるが、ログインをしてもアカウントページに飛ばない
+  - ということは、ログイン周りで何かがおかしい？
+  - redis.goのGetSessionが「Cookieが存在しません」、「SessionKeyが登録されていません」とあるので、うまくいっていない？
+
 - Androidエミュレータだと、現在地を取得できない？
   - エミュレータの画面から場所を指定することはできるが、、
   [Androidエミュレータで位置情報設定術](https://note.com/danchi_kun/n/nd4203ca7e64b)
-- iOSエミュレータが立ち上がらなくなった
-  [Flutter: Failed to launch iOS Simulator: Error: Emulator didn't connect within 60 seconds](https://qiita.com/ucan-lab/items/c50899ceaf099aa8c30f)
-- pod installでhttpでクローンしているのに、sshでクローンしようとして、クローン元がhttpしか対応していないので、エラーになる
+- pod installでhttpでクローンしているのに、sshでクローンしようとして、クローン元がhttpしか対応していないので、エラーになる->解決済
   ```sh
   # 以下にてgitの設定を見ると、
   git config --global --list
@@ -288,7 +292,7 @@ SELECT * FROM users;
   ```
 - CocoaPodsにて、エラー
 [[!] CocoaPods did not set the base configuration of your project because your project already has a custom config set. の解決法](https://qiita.com/kokogento/items/c2979542a34610925e2d)
-- iOSアプリがビルドエラーになる
+- iOSアプリがビルドエラーになる->解決済
   - XcodeにてBuild Pre-actionsのスクリプト登録の際、Provide build settings fromの部分を選択していなかった
 ```
 flutter run -d 821C1104-BCAD-462D-8E43-A202EBE587B7 --dart-define-from-file=dart_defines/dev.env
@@ -302,6 +306,8 @@ Uncategorized (Xcode): Exited with status code 127
 Could not build the application for the simulator.
 Error launching application on iPhone SE (3rd generation).
 ```
+- iOSのエミュレータが立ち上がったり、立ち上がらなかったりと不安定？->解決済
+[iOS Simulatorが起動しない時の対処法](https://qiita.com/yuuki-h/items/23ad407cffb548400142)
 
 ## 足りない知識(とりあえず思いつき次第メモ)
 ### Frontend

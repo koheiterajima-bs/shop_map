@@ -1,0 +1,1 @@
+ /Users/koheiterajima/baleen_folder/shop_map/frontend/.dart_tool/flutter_build/2ff0659d81cdaae430264346b8964a06/native_assets.yaml: 

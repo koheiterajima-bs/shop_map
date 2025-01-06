@@ -42,8 +42,10 @@ class LoginPage extends ConsumerWidget {
                 onPressed: () async {
                   try {
                     final response = await http.post(
-                      Uri.parse('http://localhost:8080/login'),
+                      // Uri.parse('http://localhost:8080/login'),
                       // Uri.parse('http://172.16.0.57:8080/login'),
+                      // Androidエミュレータ
+                      Uri.parse('http://10.0.2.2:8080/login'),
                       headers: {'Content-Type': 'application/json'},
                       body: json.encode({
                         'user_id': loginInputID,
@@ -55,6 +57,7 @@ class LoginPage extends ConsumerWidget {
                     if (response.statusCode == 200) {
                       // 遷移先ページに移動
                       context.go('/login/account');
+                      Text("これで遷移できる！！！");
                     } else {
                       // サーバーからエラーが返ってきた場合
                       ScaffoldMessenger.of(context).showSnackBar(
