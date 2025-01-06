@@ -348,6 +348,7 @@ Error launching application on iPhone SE (3rd generation).
 - [init関数のふしぎ #golang](https://qiita.com/tenntenn/items/7c70e3451ac783999b4f)
 
 ## 今後の展望
+- 各所リファクタリング
 - 各技術の知識を深掘り学習(とりあえず実装しましたになっている)
 - HTTP通信ではなく、状態を保持する通信にて実装？(WebSocket、gRPC、TCP/IP？)
   - WebSocketを使用すれば、リアルタイム更新が可能
