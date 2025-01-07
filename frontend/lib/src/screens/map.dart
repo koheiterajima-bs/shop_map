@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:http/http.dart' as http;
+import 'package:shop_map/main.dart';
 import 'dart:convert';
 import '../providers/provider.dart';
 
@@ -247,8 +248,10 @@ class MapPage extends ConsumerWidget {
                                         // 'http://localhost:8080/registeringlocation'),
                                         // Uri.parse('http://172.16.0.57:8080/registeringlocation'),
                                         // Androidエミュレータ
+                                        // Uri.parse(
+                                        //     'http://10.0.2.2:8080/registeringlocation'),
                                         Uri.parse(
-                                            'http://10.0.2.2:8080/registeringlocation'),
+                                            '${ApiConfig.baseUrl}/registeringlocation'),
                                         headers: {
                                           'Content-Type': 'application/json'
                                         },

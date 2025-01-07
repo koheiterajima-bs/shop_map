@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:shop_map/main.dart';
 
 // Googleマップコントローラーの状態管理
 // 非同期で実装？(後々、データベースやバックエンドから初期設定を取得する？)
@@ -155,11 +156,11 @@ final markerStreamProvider = StreamProvider<Set<Marker>>((ref) async* {
   while (true) {
     await Future.delayed(Duration(seconds: 5)); // 5秒ごとにリクエスト
     final response = await http.get(
-      // Uri.parse('http://localhost:8080/get-marker'),
-      // Uri.parse('http://172.16.0.57:8080/get-marker'),
-      // Androidエミュレータ
-      Uri.parse('http://10.0.2.2:8080/get-marker'),
-    );
+        // Uri.parse('http://localhost:8080/get-marker'),
+        // Uri.parse('http://172.16.0.57:8080/get-marker'),
+        // Androidエミュレータ
+        // Uri.parse('http://10.0.2.2:8080/get-marker'),
+        Uri.parse('${ApiConfig.baseUrl}/get-marker'));
     if (response.statusCode == 200) {
       // レスポンスデータ全体をデコード
       final responseData = jsonDecode(response.body);

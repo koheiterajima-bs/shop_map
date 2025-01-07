@@ -38,7 +38,8 @@ android {
         // For more information, see: https://flutter.dev/to/review-gradle-config.
         // minSdk = flutter.minSdkVersion
         minSdkVersion = 20
-        targetSdk = flutter.targetSdkVersion
+        // targetSdk = flutter.targetSdkVersion
+        targetSdkVersion = 30
         versionCode = flutter.versionCode
         versionName = flutter.versionName
         resValue "string", "google_map_api_key", "${dartDefines.ANDROID_GOOGLE_MAPS_API_KEY}"

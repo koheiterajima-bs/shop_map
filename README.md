@@ -114,27 +114,10 @@ https://zenn.dev/altiveinc/articles/separating-environments-in-flutter#xcode%E3%
     (全体)
     - GitHubにてPublicにするため、Google Maps APIキーを隠蔽したい->完了
     - Android/iOSエミュレータを起動できるようにする->完了
- 
-```
-flutter run --dart-define-from-file=frontend/dart_defines/dev.env
-Connected devices:
-macOS (desktop)                 • macos                 • darwin-arm64   • macOS 15.1.1 24B91 darwin-arm64
-Mac Designed for iPad (desktop) • mac-designed-for-ipad • darwin         • macOS 15.1.1 24B91 darwin-arm64
-Chrome (web)                    • chrome                • web-javascript • Google Chrome 131.0.6778.205
-
-Checking for wireless devices...
-
-[1]: macOS (macos)
-[2]: Mac Designed for iPad (mac-designed-for-ipad)
-[3]: Chrome (chrome)
-Please choose one (or "q" to quit): 3
-Did not find the file passed to "--dart-define-from-file". Path: frontend/dart_defines/dev.env
-```
+    - シミュレーターだとなぜか現在地を取得してくれない(実機だと現在地になる)
 
 
-    シミュレーターだとなぜか現在地を取得してくれない(実機だと現在地になる)
-
-     linterをつける(1/4ここから再開！！！)
+     linterをつける？
 
 
     - ログインで何ができるかをはっきりさせる
@@ -266,14 +249,10 @@ SELECT * FROM users;
 - 状態管理について、使い方はわかるが、どんなものかよくわかっていない->解決済
 - Riverpodの各Providerがどんなときに使うものかわかっていない->おおよそ解決済
 - showModalBottomSheetの中でProviderの状態変更を受け取れない->解決済
-- localhostだとログイン、セッション周りの動作は問題ないが、スマホ実機だとうまくいかない->
-  - もしかして、Cookieをうまくやり取りできていない？(ブラウザだと問題なし)
-  - redis.goのNewSessionにてCookieをサーバーとブラウザにセット
-  - redis.goのGetSessionにてCookieは引数にはちゃんと入っているが、おそらくそもそもCookieに登録できていない
-
-- localhostではなく、Androidエミュレータのポートである「10.0.2.2」を使えば、場所の登録はできるが、ログインをしてもアカウントページに飛ばない
-  - ということは、ログイン周りで何かがおかしい？
-  - redis.goのGetSessionが「Cookieが存在しません」、「SessionKeyが登録されていません」とあるので、うまくいっていない？
+- webではなく、Android/iOSエミュレータを使うと、ログインができない
+  - redis.goのGetSessionにてCookieが存在しませんとエラー
+    - CORS設定と考え、router.goにCORSを記述->変わらず
+    - Go(Gin)の設定で引っかかっている？(Webで確認する限り、Cookieがブラウザにセットされていない)
 
 - Androidエミュレータだと、現在地を取得できない？
   - エミュレータの画面から場所を指定することはできるが、、
@@ -339,11 +318,13 @@ Error launching application on iPhone SE (3rd generation).
 - [【Flutter】環境ごとのAPIキーをiOS/Androidネイティブ側に設定する【Google Maps API】](https://zenn.dev/altiveinc/articles/flutter-set-native-api-keys-per-env)
 - [【Flutter 3.19対応】Dart-define-from-fileを使って開発環境と本番環境を分ける](https://zenn.dev/altiveinc/articles/separating-environments-in-flutter)
 - [FlutterアプリにGoogleマップを追加する](https://codelabs.developers.google.com/codelabs/google-maps-in-flutter?hl=ja#2)
+- [【Flutter】コマンド一発でスプラッシュ画面を実装する【flutter_native_splash】](https://zenn.dev/susatthi/articles/20220406-061305-flutter-native-splash)
+- [Library: スプラッシュスクリーンの実装](https://zenn.dev/web_tips/books/df8423bbb204a1/viewer/60cdda)
+- [Library: アプリアイコンの設定方法](https://zenn.dev/web_tips/books/df8423bbb204a1/viewer/054dd2)
 
 (未読)
 - [「内側」から理解する Flutter 入門](https://zenn.dev/chooyan/books/934f823764db62)
 - [仕組みから理解する Riverpod](https://zenn.dev/chooyan/books/92a0a489f68233)
-- [【Flutter】コマンド一発でスプラッシュ画面を実装する【flutter_native_splash】](https://zenn.dev/susatthi/articles/20220406-061305-flutter-native-splash)
 
 ### Backend
 - [docker-composeでgolangとMySQLを繋ぐ](https://zenn.dev/ajapa/articles/443c396a2c5dd1)

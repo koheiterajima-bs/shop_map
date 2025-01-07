@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:http/http.dart' as http;
+import 'package:shop_map/main.dart';
 import 'dart:convert';
 import '../providers/provider.dart';
 
@@ -45,7 +46,8 @@ class SignUpPage extends ConsumerWidget {
                       // Uri.parse('http://localhost:8080/login/signup'),
                       // Uri.parse('http://172.16.0.57:8080/login/signup'),
                       // Androidエミュレータ
-                      Uri.parse('http://10.0.2.2:8080/login/signup'),
+                      // Uri.parse('http://10.0.2.2:8080/login/signup'),
+                      Uri.parse('${ApiConfig.baseUrl}/login/signup'),
                       headers: {'Content-Type': 'application/json'},
                       body: json.encode({
                         'user_id': signupInputID,

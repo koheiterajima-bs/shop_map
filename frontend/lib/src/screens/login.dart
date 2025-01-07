@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:http/http.dart' as http;
+import 'package:shop_map/main.dart';
 import 'dart:convert';
 import '../providers/provider.dart';
 
@@ -40,18 +41,22 @@ class LoginPage extends ConsumerWidget {
               SizedBox(height: 20),
               ElevatedButton(
                 onPressed: () async {
+                  print("Button pressed");
                   try {
                     final response = await http.post(
                       // Uri.parse('http://localhost:8080/login'),
                       // Uri.parse('http://172.16.0.57:8080/login'),
                       // Androidエミュレータ
-                      Uri.parse('http://10.0.2.2:8080/login'),
+                      // Uri.parse('http://10.0.2.2:8080/login'),
+                      Uri.parse('${ApiConfig.baseUrl}/login'),
                       headers: {'Content-Type': 'application/json'},
                       body: json.encode({
                         'user_id': loginInputID,
                         'password': loginInputPassword
                       }),
                     );
+
+                    print(response.statusCode);
 
                     // 正常終了時の処理
                     if (response.statusCode == 200) {

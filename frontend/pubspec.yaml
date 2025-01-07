@@ -43,6 +43,8 @@ dependencies:
   geolocator: ^13.0.2
   http: ^1.2.2
   flutter_dotenv: ^5.2.1
+  flutter_native_splash: ^2.4.4
+  flutter_launcher_icons: ^0.14.2
 
 dev_dependencies:
   flutter_test:
@@ -54,6 +56,22 @@ dev_dependencies:
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
   flutter_lints: ^4.0.0
+
+flutter_native_splash:
+  image: "assets/images/splash-img.jpg"
+  color: "#ffffff"
+
+  # Android12以降用の設定
+  android_12:
+    image: "assets/images/splash-img.png"
+    icon_background_color: "#ffffff"
+
+flutter_launcher_icons:
+  android: true
+  ios: true  
+  image_path: "assets/images/splash-img.png"
+  adaptive_icon_background: "assets/images/white_background.png"
+  adaptive_icon_foreground: "assets/images/transparent_foreground.png"
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec

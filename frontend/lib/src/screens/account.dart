@@ -4,6 +4,7 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../providers/provider.dart';
+import 'package:shop_map/main.dart';
 
 // アカウントページ
 class AccountPage extends ConsumerWidget {
@@ -50,7 +51,8 @@ class AccountPage extends ConsumerWidget {
                                 // Uri.parse('http://localhost:8080/logout'),
                                 // Uri.parse('http://172.16.0.57:8080/logout'),
                                 // Androidエミュレータ
-                                Uri.parse('http://10.0.2.2:8080/logout'),
+                                // Uri.parse('http://10.0.2.2:8080/logout'),
+                                Uri.parse('${ApiConfig.baseUrl}/logout'),
                               );
 
                               // 正常終了時の処理
@@ -108,7 +110,8 @@ class AccountPage extends ConsumerWidget {
                               // Uri.parse('http://localhost:8080/get-marker'),
                               // Uri.parse('http://172.16.0.57:8080/get-marker'),
                               // Androidエミュレータ
-                              Uri.parse('http://10.0.2.2:8080/get-marker'),
+                              // Uri.parse('http://10.0.2.2:8080/get-marker'),
+                              Uri.parse('${ApiConfig.baseUrl}/get-marker'),
                             );
 
                             // 正常終了時の処理
@@ -246,7 +249,8 @@ Future<bool> _checkSession() async {
         // Uri.parse('http://localhost:8080/check-session'),
         // Uri.parse('http://172.16.0.57:8080/check-session'),
         // Androidエミュレータ
-        Uri.parse('http://10.0.2.2:8080/check-session'),
+        // Uri.parse('http://10.0.2.2:8080/check-session'),
+        Uri.parse('${ApiConfig.baseUrl}/check-session'),
         headers: {'Content-Type': 'application/json'});
 
     if (response.statusCode == 200) {

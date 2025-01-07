@@ -39,10 +39,14 @@ func NewSession(c *gin.Context, cookieKey, redisValue string) {
 	if err := conn.Set(newRedisKey, redisValue, 0).Err(); err != nil {
 		panic("Session登録時にエラーが発生:" + err.Error())
 	}
+
+	// samesiteをnonemodeにする
+	c.SetSameSite(http.SameSiteNoneMode)
+
 	// クライアントにCookieをセット(ブラウザ側)
 	// c.SetCookie(cookieKey, newRedisKey, 0, "/", "localhost", false, false)
 	// c.SetCookie(cookieKey, newRedisKey, 0, "/", "172.16.0.57", false, false)
-	c.SetCookie(cookieKey, newRedisKey, 0, "/", "", false, false)
+	c.SetCookie(cookieKey, newRedisKey, 0, "/", "", false, true)
 	fmt.Println("Redis key:", newRedisKey)
 	fmt.Println("Redis value:", redisValue)
 }

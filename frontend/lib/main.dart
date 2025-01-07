@@ -7,12 +7,26 @@ import 'src/screens/account.dart';
 import 'src/screens/howtouse.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'src/bottom_menu.dart';
+import 'dart:io';
 
 void main() {
   runApp(
     // Riverpodでデータを受け渡しできる状態にする
     const ProviderScope(child: ShopMapApp()),
   );
+}
+
+// AndroidとiOSでポート番号切り替え用
+class ApiConfig {
+  static String get baseUrl {
+    if (Platform.isAndroid) {
+      return "http://10.0.2.2:8080"; // Androidエミュレータの場合
+    } else if (Platform.isIOS) {
+      return "http://localhost:8080"; // iOSエミュレータの場合
+    } else {
+      return "http://localhost:8080"; // WEBまたはその他のプラットフォームの場合
+    }
+  }
 }
 
 // それぞれどのルートがどのNavigatorに所属しているかを区別するためにGlobalKeyを生成し、各ルートおよびブランチに所属するNavigatorのGlobalKeyを紐づける
