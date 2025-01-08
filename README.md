@@ -228,6 +228,10 @@ https://zenn.dev/altiveinc/articles/separating-environments-in-flutter#xcode%E3%
   - maybeWhen:特定の状態での処理を定義し、それ以外ではorElseで指定したデフォルト値を返す
 - CocoaPods
   - iOSおよびmacOSアプリケーションの開発におけるライブラリや依存関係を管理するためのツール
+- git-filter-repo
+  - Gitリポジトリの履歴を効率的に変更・フィルタリングするためのツール
+    - 履歴から特定のファイルやディレクトリを削除
+    - 特定のコミットを削除
 
 
 ## メモ
@@ -289,8 +293,15 @@ Error launching application on iPhone SE (3rd generation).
 - iOSのエミュレータが立ち上がったり、立ち上がらなかったりと不安定？->解決済
 [iOS Simulatorが起動しない時の対処法](https://qiita.com/yuuki-h/items/23ad407cffb548400142)
 - デバッグファイルの容量が大きく、GitHubの制限容量を超えてしまう
-```
-time git filter-branch --index-filter 'git rm --ignore-unmatch frontend/build/app/outputs/apk/debug/app-debug.apk' --tag-name-filter 'cat' -- --all
+[巨大なファイルを含んだリポジトリの履歴を改変して GitHub にインポートする方法](https://qiita.com/osakiy/items/cf59c7a535f2fb1c0f90)
+```sh
+# git-filter-repoを使って、buildディレクトリ以下のディレクトリのコミット履歴を削除
+git filter-repo --path frontend/build/ --invert-paths
+
+# git filter-repoは過去のコミットも変更するため、操作後はリモートリポジトリに強制的にpushする必要がある
+git push origin --force --all
+
+
 
 ```
 
