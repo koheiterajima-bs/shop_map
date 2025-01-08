@@ -1,3 +1,33 @@
+# Flutter/Dart関連のファイル
+**/.dart_tool/
+**/.flutter-plugins
+**/.flutter-plugins-dependencies
+**/.packages
+**/pubspec.lock
+
+# ビルドディレクトリ
+**/build/
+**/ios/Pods/
+**/ios/.symlinks/
+**/ios/Flutter/Flutter.framework/
+**/ios/Flutter/Flutter.podspec
 **/ios/Flutter/Dart-Defines.xcconfig
-frontend/dart_defines/dev.env
-frontend/build/
+**/ios/Flutter/Generated.xcconfig
+**/android/.gradle/
+**/android/app/build/
+**/android/build/
+
+# IDE関連の設定
+**/.vscode/
+**/.idea/
+
+# macOSなどのOS固有のファイル
+**/.DS_Store
+
+# その他の環境依存ファイル
+**/*.log
+**/*.tmp
+**/*.swp
+
+# envファイル
+**/dart_defines/dev.env
