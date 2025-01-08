@@ -8,8 +8,10 @@ import 'src/screens/howtouse.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'src/bottom_menu.dart';
 import 'dart:io';
+import 'src/services/dio_client.dart';
 
 void main() {
+  setupDio();
   runApp(
     // Riverpodでデータを受け渡しできる状態にする
     const ProviderScope(child: ShopMapApp()),

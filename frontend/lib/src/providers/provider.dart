@@ -197,21 +197,3 @@ final markerStreamProvider = StreamProvider<Set<Marker>>((ref) async* {
 // final markersProvider = StateProvider<Set<Marker>>((ref) {
 //   return ref.watch(markerStreamProvider);
 // });
-
-// 以下テスト用(後で消す)
-// account.dartに記載
-final AutoDisposeStateProvider<bool> isCheckedProvider =
-    StateProvider.autoDispose((ref) {
-  return false;
-});
-
-// map.dartに記載
-final counterStreamProvider = StreamProvider<int>((ref) async* {
-  int count = 0;
-  while (true) {
-    await Future.delayed(Duration(seconds: 1));
-    count++;
-    print('現在の秒数: $count');
-    yield count;
-  }
-});

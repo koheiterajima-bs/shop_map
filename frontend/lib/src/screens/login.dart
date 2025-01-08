@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:http/http.dart' as http;
 import 'package:shop_map/main.dart';
-import 'dart:convert';
 import '../providers/provider.dart';
+import 'package:dio/dio.dart';
+import '../services/dio_client.dart';
 
 // ログイン画面表示
 class LoginPage extends ConsumerWidget {
@@ -33,6 +33,7 @@ class LoginPage extends ConsumerWidget {
               TextFormField(
                   // テキスト入力のラベルを設定
                   decoration: InputDecoration(labelText: 'パスワード'),
+                  obscureText: true, // 入力を隠す
                   onChanged: (String value) {
                     // ユーザーの入力をProviderに保存
                     ref.watch(loginInputPasswordProvider.notifier).state =
@@ -41,37 +42,43 @@ class LoginPage extends ConsumerWidget {
               SizedBox(height: 20),
               ElevatedButton(
                 onPressed: () async {
-                  print("Button pressed");
                   try {
-                    final response = await http.post(
-                      // Uri.parse('http://localhost:8080/login'),
-                      // Uri.parse('http://172.16.0.57:8080/login'),
-                      // Androidエミュレータ
-                      // Uri.parse('http://10.0.2.2:8080/login'),
-                      Uri.parse('${ApiConfig.baseUrl}/login'),
-                      headers: {'Content-Type': 'application/json'},
-                      body: json.encode({
-                        'user_id': loginInputID,
-                        'password': loginInputPassword
-                      }),
-                    );
+                    // Dioにてログイン処理を行う
+                    final response = await dio
+                        .post('${ApiConfig.baseUrl}/login', data: {
+                      'user_id': loginInputID,
+                      'password': loginInputPassword
+                    });
+                    print("Response data: ${response.data}");
 
-                    print(response.statusCode);
+                    // Cookieの動作確認(Cookieを受け取れているか)
+                    // final cookies = await cookieJar
+                    //     .loadForRequest(Uri.parse(ApiConfig.baseUrl));
+                    // print("Cookies: $cookies");
 
                     // 正常終了時の処理
                     if (response.statusCode == 200) {
+                      // 以下のloginページ遷移を行う前にSnackBarを表示させる
+                      Future.microtask(() {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text("ログインしました")),
+                        );
+                      });
                       // 遷移先ページに移動
-                      context.go('/login/account');
-                      Text("これで遷移できる！！！");
+                      Future.microtask(() {
+                        context.go('/login/account');
+                      });
                     } else {
                       // サーバーからエラーが返ってきた場合
                       ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text('サーバーエラー: ${response.body}')),
+                        SnackBar(content: Text('サーバーエラー: ${response.data}')),
                       );
                     }
-                  } catch (e) {
+                  } on DioException catch (e) {
+                    print('DioException: ${e.response?.data}');
                     ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('エラーが発生しました: $e')),
+                      SnackBar(
+                          content: Text('エラーが発生しました: ${e.response?.data}')),
                     );
                   }
                 },

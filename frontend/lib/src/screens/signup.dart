@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:http/http.dart' as http;
 import 'package:shop_map/main.dart';
-import 'dart:convert';
 import '../providers/provider.dart';
+import '../services/dio_client.dart';
 
 // 新規登録表示
 class SignUpPage extends ConsumerWidget {
@@ -33,6 +32,7 @@ class SignUpPage extends ConsumerWidget {
               TextFormField(
                   // テキスト入力のラベルを設定
                   decoration: InputDecoration(labelText: 'パスワード'),
+                  obscureText: true, // ここで入力を隠す
                   onChanged: (String value) {
                     // ユーザーの入力をProviderに保存
                     ref.watch(signupInputPasswordProvider.notifier).state =
@@ -42,27 +42,29 @@ class SignUpPage extends ConsumerWidget {
               ElevatedButton(
                 onPressed: () async {
                   try {
-                    final response = await http.post(
-                      // Uri.parse('http://localhost:8080/login/signup'),
-                      // Uri.parse('http://172.16.0.57:8080/login/signup'),
-                      // Androidエミュレータ
-                      // Uri.parse('http://10.0.2.2:8080/login/signup'),
-                      Uri.parse('${ApiConfig.baseUrl}/login/signup'),
-                      headers: {'Content-Type': 'application/json'},
-                      body: json.encode({
-                        'user_id': signupInputID,
-                        'password': signupInputPassword
-                      }),
-                    );
+                    // Dioにてサインアップ処理を行う
+                    final response = await dio
+                        .post('${ApiConfig.baseUrl}/login/signup', data: {
+                      'user_id': signupInputID,
+                      'password': signupInputPassword
+                    });
 
                     // 正常終了時の処理
                     if (response.statusCode == 200) {
+                      // 以下のloginページ遷移を行う前にSnackBarを表示させる
+                      Future.microtask(() {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text("新規登録ができました")),
+                        );
+                      });
                       // 遷移先ページに移動
-                      context.go('/login/account');
+                      Future.microtask(() {
+                        context.go('/login/account');
+                      });
                     } else {
                       // サーバーからエラーが返ってきた場合
                       ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text('サーバーエラー: ${response.body}')),
+                        SnackBar(content: Text('サーバーエラー: ${response.data}')),
                       );
                     }
                   } catch (e) {

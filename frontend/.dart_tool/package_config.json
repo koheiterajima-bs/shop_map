@@ -62,6 +62,12 @@
       "languageVersion": "2.18"
     },
     {
+      "name": "cookie_jar",
+      "rootUri": "file:///Users/koheiterajima/.pub-cache/hosted/pub.dev/cookie_jar-4.0.8",
+      "packageUri": "lib/",
+      "languageVersion": "2.15"
+    },
+    {
       "name": "crypto",
       "rootUri": "file:///Users/koheiterajima/.pub-cache/hosted/pub.dev/crypto-3.0.6",
       "packageUri": "lib/",
@@ -78,6 +84,24 @@
       "rootUri": "file:///Users/koheiterajima/.pub-cache/hosted/pub.dev/cupertino_icons-1.0.8",
       "packageUri": "lib/",
       "languageVersion": "3.1"
+    },
+    {
+      "name": "dio",
+      "rootUri": "file:///Users/koheiterajima/.pub-cache/hosted/pub.dev/dio-5.7.0",
+      "packageUri": "lib/",
+      "languageVersion": "2.18"
+    },
+    {
+      "name": "dio_cookie_manager",
+      "rootUri": "file:///Users/koheiterajima/.pub-cache/hosted/pub.dev/dio_cookie_manager-3.1.1",
+      "packageUri": "lib/",
+      "languageVersion": "2.15"
+    },
+    {
+      "name": "dio_web_adapter",
+      "rootUri": "file:///Users/koheiterajima/.pub-cache/hosted/pub.dev/dio_web_adapter-2.0.0",
+      "packageUri": "lib/",
+      "languageVersion": "3.3"
     },
     {
       "name": "fake_async",
@@ -458,7 +482,7 @@
       "languageVersion": "3.5"
     }
   ],
-  "generated": "2025-01-08T01:24:57.147823Z",
+  "generated": "2025-01-08T06:59:20.799443Z",
   "generator": "pub",
   "generatorVersion": "3.5.3",
   "flutterRoot": "file:///Users/koheiterajima/development/flutter",

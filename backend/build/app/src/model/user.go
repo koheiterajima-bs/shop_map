@@ -67,3 +67,12 @@ func Login(userId, password string) (*User, error) {
 	// 一致した場合、該当ユーザーを返す
 	return &user, nil
 }
+
+// ユーザー情報取得の処理
+func GetAllUsersInformation() ([]User, error) {
+	var users []User
+	if err := db.Find(&users).Error; err != nil {
+		return nil, err
+	}
+	return users, nil
+}

@@ -3,18 +3,14 @@ import 'package:go_router/go_router.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../providers/provider.dart';
 import 'package:shop_map/main.dart';
+import 'package:dio/dio.dart';
+import '../services/dio_client.dart';
 
 // アカウントページ
 class AccountPage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final bool isChecked = ref.watch(isCheckedProvider);
-
-    // StreamProviderテスト用
-    final counterStream = ref.watch(counterStreamProvider);
-
     // flavor確認用
     const flavor = String.fromEnvironment('flavor');
 
@@ -28,6 +24,12 @@ class AccountPage extends ConsumerWidget {
               ),
             );
           } else if (snapshot.hasError || snapshot.data == false) {
+            // 以下のloginページ遷移を行う前にSnackBarを表示させる
+            Future.microtask(() {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text('セッション確認ができませんでした')),
+              );
+            });
             // エラーまたは未ログイン状態ならログインページにリダイレクト
             Future.microtask(() {
               context.go('/login');
@@ -47,24 +49,29 @@ class AccountPage extends ConsumerWidget {
                       ElevatedButton(
                           onPressed: () async {
                             try {
-                              final response = await http.post(
-                                // Uri.parse('http://localhost:8080/logout'),
-                                // Uri.parse('http://172.16.0.57:8080/logout'),
-                                // Androidエミュレータ
-                                // Uri.parse('http://10.0.2.2:8080/logout'),
-                                Uri.parse('${ApiConfig.baseUrl}/logout'),
+                              final response = await dio.post(
+                                '${ApiConfig.baseUrl}/logout',
                               );
 
                               // 正常終了時の処理
                               if (response.statusCode == 200) {
+                                // 以下のloginページ遷移を行う前にSnackBarを表示させる
+                                Future.microtask(() {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(content: Text('ログアウトしました')),
+                                  );
+                                });
                                 // ログインページに移動
-                                context.go('/login');
+                                Future.microtask(() {
+                                  context.go('/login');
+                                });
                               } else {
                                 // サーバーからエラーが返ってきた場合
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   SnackBar(
                                       content:
-                                          Text('サーバーエラー: ${response.body}')),
+                                          // Text('サーバーエラー: ${response.body}')
+                                          Text('サーバーエラー: ${response.data}')),
                                 );
                               }
                             } catch (e) {
@@ -74,34 +81,6 @@ class AccountPage extends ConsumerWidget {
                             }
                           },
                           child: Text('ログアウト')),
-                      SizedBox(height: 15),
-                      Center(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Text(isChecked ? "ON" : "OFF"),
-                            Checkbox(
-                              value: isChecked,
-                              onChanged: (bool? checkedValue) {
-                                if (checkedValue != null) {
-                                  ref.read(isCheckedProvider.notifier).state =
-                                      checkedValue;
-                                }
-                              },
-                            ),
-                          ],
-                        ),
-                      ),
-                      Center(
-                        child: counterStream.when(
-                          data: (count) => Text(
-                            'カウント: $count 秒',
-                            style: TextStyle(fontSize: 24),
-                          ),
-                          loading: () => CircularProgressIndicator(),
-                          error: (error, stack) => Text('エラー: $error'),
-                        ),
-                      ),
                       SizedBox(height: 15),
                       ElevatedButton(
                         onPressed: () async {
@@ -149,6 +128,43 @@ class AccountPage extends ConsumerWidget {
                         },
                         child: Text("マーカー全件取得"),
                       ),
+                      SizedBox(height: 15),
+                      ElevatedButton(
+                        onPressed: () async {
+                          try {
+                            final response = await http.get(
+                              Uri.parse('${ApiConfig.baseUrl}/get-user'),
+                            );
+
+                            // 正常終了時の処理
+                            if (response.statusCode == 200) {
+                              // レスポンスデータ全体をデコード
+                              final responseData = jsonDecode(response.body);
+
+                              // user配列を取得
+                              final users = responseData['user'] as List;
+
+                              // 各userからuser_idのみを抽出
+                              final userNameList =
+                                  users.map((user) => user['user_id']).toList();
+
+                              print("取得したUserのリスト: $userNameList");
+                            } else {
+                              // サーバーからエラーが返ってきた場合
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text("サーバーエラー: ${response.body}"),
+                                ),
+                              );
+                            }
+                          } catch (e) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text("エラーが発生しました: $e")),
+                            );
+                          }
+                        },
+                        child: Text("ユーザー情報全件取得"),
+                      ),
                     ],
                   ),
                 ),
@@ -158,6 +174,30 @@ class AccountPage extends ConsumerWidget {
         });
   }
 }
+
+// セッション確認APIを呼び出す関数
+Future<bool> _checkSession() async {
+  try {
+    final response = await dio.get(
+      '${ApiConfig.baseUrl}/check-session',
+      options: Options(
+        headers: {'Content-Type': 'application/json'},
+      ),
+    );
+
+    if (response.statusCode == 200) {
+      // Dioではレスポンスのデータは自動的にデコードされる
+      final responseData = response.data;
+      return responseData['message'] == 'ログイン済み';
+    } else {
+      return false;
+    }
+  } catch (e) {
+    print("セッションのエラー？？？: $e");
+    return false;
+  }
+}
+
 // // アカウントページ
 // class AccountPage extends StatelessWidget {
 //   @override
@@ -241,26 +281,3 @@ class AccountPage extends ConsumerWidget {
 //         });
 //   }
 // }
-
-// セッション確認APIを呼び出す関数
-Future<bool> _checkSession() async {
-  try {
-    final response = await http.get(
-        // Uri.parse('http://localhost:8080/check-session'),
-        // Uri.parse('http://172.16.0.57:8080/check-session'),
-        // Androidエミュレータ
-        // Uri.parse('http://10.0.2.2:8080/check-session'),
-        Uri.parse('${ApiConfig.baseUrl}/check-session'),
-        headers: {'Content-Type': 'application/json'});
-
-    if (response.statusCode == 200) {
-      final responseData = json.decode(response.body);
-      return responseData['message'] == 'ログイン済み';
-    } else {
-      return false;
-    }
-  } catch (e) {
-    print("エラー: $e");
-    return false;
-  }
-}

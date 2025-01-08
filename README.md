@@ -115,6 +115,7 @@ https://zenn.dev/altiveinc/articles/separating-environments-in-flutter#xcode%E3%
     - GitHubにてPublicにするため、Google Maps APIキーを隠蔽したい->完了
     - Android/iOSエミュレータを起動できるようにする->完了
     - シミュレーターだとなぜか現在地を取得してくれない(実機だと現在地になる)
+    - MySQLに保存されたユーザー情報の取得->ここから再開！！！！(1/8)
 
 
      linterをつける？
@@ -232,7 +233,9 @@ https://zenn.dev/altiveinc/articles/separating-environments-in-flutter#xcode%E3%
   - Gitリポジトリの履歴を効率的に変更・フィルタリングするためのツール
     - 履歴から特定のファイルやディレクトリを削除
     - 特定のコミットを削除
-
+- Cookieのモバイルアプリにおける扱い
+  - Webブラウザは、HTTPレスポンスに含まれるSet-Cookieヘッダーを自動的に解釈し、Cookieを管理する
+  - モバイルアプリではCookieの自動管理は行われず、HTTPクライアントライブラリ(dioやhttp)にてHTTPレスポンスを取得しなくてはならない
 
 ## メモ
 - viewディレクトリ：HTMLファイルを格納
@@ -254,11 +257,14 @@ SELECT * FROM users;
 - 状態管理について、使い方はわかるが、どんなものかよくわかっていない->解決済
 - Riverpodの各Providerがどんなときに使うものかわかっていない->おおよそ解決済
 - showModalBottomSheetの中でProviderの状態変更を受け取れない->解決済
-- webではなく、Android/iOSエミュレータを使うと、ログインができない
+- webではなく、Android/iOSエミュレータを使うと、ログインができない->解決済
   - redis.goのGetSessionにてCookieが存在しませんとエラー
     - CORS設定と考え、router.goにCORSを記述->変わらず
     - Go(Gin)の設定で引っかかっている？(Webで確認する限り、Cookieがブラウザにセットされていない)
-
+    - フロントのaccount.dartファイルにて確認したところ、エラーまたは未ログイン状態でログインページにリダイレクトされてしまっていると判明
+    - Flutter webではうまくいっていたので、もしかしてAndroidのCookieの設定とかあるのか->モバイルアプリではCookieの自動管理は行われないので、HTTPクライアントライブラリを用いなくてはならない
+    - Dioを使うことで、クライアントにCookieが渡されているところまでは確認できた
+    - セッション確認APIを呼び出す関数においてもDioにて行うことでログイン処理ができるようになった
 - Androidエミュレータだと、現在地を取得できない？
   - エミュレータの画面から場所を指定することはできるが、、
   [Androidエミュレータで位置情報設定術](https://note.com/danchi_kun/n/nd4203ca7e64b)
@@ -300,9 +306,6 @@ git filter-repo --path frontend/build/ --invert-paths
 
 # git filter-repoは過去のコミットも変更するため、操作後はリモートリポジトリに強制的にpushする必要がある
 git push origin --force --all
-
-
-
 ```
 
 ## 足りない知識(とりあえず思いつき次第メモ)
@@ -338,6 +341,7 @@ git push origin --force --all
 - [【Flutter】コマンド一発でスプラッシュ画面を実装する【flutter_native_splash】](https://zenn.dev/susatthi/articles/20220406-061305-flutter-native-splash)
 - [Library: スプラッシュスクリーンの実装](https://zenn.dev/web_tips/books/df8423bbb204a1/viewer/60cdda)
 - [Library: アプリアイコンの設定方法](https://zenn.dev/web_tips/books/df8423bbb204a1/viewer/054dd2)
+- [FlutterでHttpClientのDioを使用して認証情報などをクッキー（Cookie）に持たせる方法](https://qiita.com/koseidaiki/items/9a68b1406ee4b06b2c67)
 
 (未読)
 - [「内側」から理解する Flutter 入門](https://zenn.dev/chooyan/books/934f823764db62)
@@ -356,3 +360,8 @@ git push origin --force --all
 - 各技術の知識を深掘り学習(とりあえず実装しましたになっている)
 - HTTP通信ではなく、状態を保持する通信にて実装？(WebSocket、gRPC、TCP/IP？)
   - WebSocketを使用すれば、リアルタイム更新が可能
+
+## メモ
+```
+flutter run -d emulator-5554 --dart-define-from-file=dart_defines/dev.env
+```
