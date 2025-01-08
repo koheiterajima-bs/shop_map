@@ -229,6 +229,7 @@ https://zenn.dev/altiveinc/articles/separating-environments-in-flutter#xcode%E3%
 - CocoaPods
   - iOSおよびmacOSアプリケーションの開発におけるライブラリや依存関係を管理するためのツール
 
+
 ## メモ
 - viewディレクトリ：HTMLファイルを格納
 - buildディレクトリ：Dockerファイルを格納(アプリ用(Golang)とデータベース用)
@@ -287,6 +288,11 @@ Error launching application on iPhone SE (3rd generation).
 ```
 - iOSのエミュレータが立ち上がったり、立ち上がらなかったりと不安定？->解決済
 [iOS Simulatorが起動しない時の対処法](https://qiita.com/yuuki-h/items/23ad407cffb548400142)
+- デバッグファイルの容量が大きく、GitHubの制限容量を超えてしまう
+```
+time git filter-branch --index-filter 'git rm --ignore-unmatch frontend/build/app/outputs/apk/debug/app-debug.apk' --tag-name-filter 'cat' -- --all
+
+```
 
 ## 足りない知識(とりあえず思いつき次第メモ)
 ### Frontend
