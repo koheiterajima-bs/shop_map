@@ -244,12 +244,6 @@ class MapPage extends ConsumerWidget {
                                       }
 
                                       final response = await http.post(
-                                        // Uri.parse(
-                                        // 'http://localhost:8080/registeringlocation'),
-                                        // Uri.parse('http://172.16.0.57:8080/registeringlocation'),
-                                        // Androidエミュレータ
-                                        // Uri.parse(
-                                        //     'http://10.0.2.2:8080/registeringlocation'),
                                         Uri.parse(
                                             '${ApiConfig.baseUrl}/registeringlocation'),
                                         headers: {

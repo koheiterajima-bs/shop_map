@@ -197,3 +197,6 @@ final markerStreamProvider = StreamProvider<Set<Marker>>((ref) async* {
 // final markersProvider = StateProvider<Set<Marker>>((ref) {
 //   return ref.watch(markerStreamProvider);
 // });
+
+// セッション確認時にユーザー名を保持するProvider
+final sessionUserIDProvider = StateProvider<String>((ref) => "");

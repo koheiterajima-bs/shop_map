@@ -68,11 +68,20 @@ func Login(userId, password string) (*User, error) {
 	return &user, nil
 }
 
-// ユーザー情報取得の処理
+// 全ユーザー情報取得の処理
 func GetAllUsersInformation() ([]User, error) {
 	var users []User
 	if err := db.Find(&users).Error; err != nil {
 		return nil, err
 	}
 	return users, nil
+}
+
+// ユーザー情報取得の処理
+func GetUserInformation() (*User, error) {
+	var user User
+	if err := db.Find(&user).Error; err != nil {
+		return nil, err
+	}
+	return &user, nil
 }

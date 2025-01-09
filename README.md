@@ -1,13 +1,10 @@
 # 何をするか
 
 ## やりたいこと(ガチャガチャ検索アプリ)
-- 会員機能(ログイン/ログアウト)
-(基本情報登録)
+- 会員機能(ログイン/ログアウト)でガチャ場所の基本情報登録が可能になる
   - 何系が多いか(キャラ、ミニチュア、マニアック)
   - 何台程度あるか
   - 両替機はあるか
-(直近の情報登録)
-  - その場所個々の掲示板を作成し、最新の情報等を共有する
 - 管理者機能の実装(アカウント管理、ガチャ場所管理等)
 
 ## 起動方法
@@ -22,6 +19,16 @@ flutter run -d {指定のエミュレータ} --dart-define-from-file=dart_define
 
 # iOSについては、以下参照のご確認をお願いいたします(Xcodeの設定)
 https://zenn.dev/altiveinc/articles/separating-environments-in-flutter#xcode%E3%81%AEbuild-pre-actions-%E3%81%AB%E4%BD%9C%E6%88%90%E3%81%97%E3%81%9F%E3%82%B9%E3%82%AF%E3%83%AA%E3%83%97%E3%83%88%E3%82%92%E7%99%BB%E9%8C%B2%E3%81%99%E3%82%8B
+
+# データベースのテーブル確認
+docker exec -it shop_map_db mysql -u root -p
+
+USE shopmap_database;
+
+SHOW TABLES;
+
+# users or locations
+SELECT * FROM users;
 ```
 
 ### なぜ作ろうと思ったか
@@ -48,7 +55,7 @@ https://zenn.dev/altiveinc/articles/separating-environments-in-flutter#xcode%E3%
 ## 予定(1月末まで)(12/4スタート)
 - バックエンド
   - ログイン機能
-    - フロント部分を簡素に作成->完了
+    - [x] フロント部分を簡素に作成->完了
     - DockerにてMySQLのコンテナ作成->完了
     - DockerにてGolangのコンテナ作成->完了
     - GolangにてMySQLに接続し、コマンドにMySQLデータ取得->完了
@@ -110,12 +117,15 @@ https://zenn.dev/altiveinc/articles/separating-environments-in-flutter#xcode%E3%
     - ログイン画面にて、入力したものをGolang側へリクエストを投げる->完了
     - アカウントページの作成と新規登録、ログイン画面からアカウントページへ飛ぶルーティング->完了
     - アカウントページをログイン状態でないとアクセスできないようにする->完了
+    - 自身の投稿の編集・削除をできるようにする
 
     (全体)
     - GitHubにてPublicにするため、Google Maps APIキーを隠蔽したい->完了
     - Android/iOSエミュレータを起動できるようにする->完了
     - シミュレーターだとなぜか現在地を取得してくれない(実機だと現在地になる)
-    - MySQLに保存されたユーザー情報の取得->ここから再開！！！！(1/8)
+    - MySQLに保存されたユーザー情報の取得->完了
+    - READMEにチェックボックスを付け、進捗を見やすく
+    - エラーや問題をなくす
 
 
      linterをつける？
@@ -236,20 +246,35 @@ https://zenn.dev/altiveinc/articles/separating-environments-in-flutter#xcode%E3%
 - Cookieのモバイルアプリにおける扱い
   - Webブラウザは、HTTPレスポンスに含まれるSet-Cookieヘッダーを自動的に解釈し、Cookieを管理する
   - モバイルアプリではCookieの自動管理は行われず、HTTPクライアントライブラリ(dioやhttp)にてHTTPレスポンスを取得しなくてはならない
+- db.Whereとdb.Findの違い
+  - db.Find：条件なしで全てのレコードを取得したり、指定した条件で複数件を取得する際に使用
+  - db.Where：条件を指定したクエリを構築し、1件または複数件を取得する際に使用
 
-## メモ
-- viewディレクトリ：HTMLファイルを格納
-- buildディレクトリ：Dockerファイルを格納(アプリ用(Golang)とデータベース用)
-- データベースのテーブルに格納されているかの確認
-```
-docker exec -it shop_map_db mysql -u root -p
+### 各ロジックの考え方メモ
+- ログイン処理
+  - フロントエンド
+    - (login.dart)'/login'エンドポイントに対し、IDとPasswordを渡し、POSTリクエストを行う
+    - (login.dart)レスポンスを受け取り、statusが正常(200)の場合は'/login/account'ページに遷移
+  - バックエンド
+    - (router.go)ルーターでエンドポイントを設定
+    - (loginController.go)メソッドの操作(データベース操作とセッションを新規作成)
+    - (user.go)引数のIDを用い、データベースから検索を行い、一致するものがあれば、パスワード照合を行う、ここまでできたらユーザー情報を返す
+    - (redis.go)cookieKeyとuser_idを引数として受け取り、Redis(サーバー側)とクライアント(ブラウザ側)にセット
+    - (loginController.go)フロントエンド側にuserをレスポンスとして返す
+- 新規登録処理(ログイン処理と同処理部分は省略)
+  - バックエンド
+    - (user.go)引数のIDを用い、同一名の登録がないかデータベースで検索を行い、一致するものがなければパスワードの暗号化を行い、データベースへ登録
+- セッション処理
+  - フロントエンド
+    - (account.dart)_checkSessionを用い、'/check-session'エンドポイントに対し、GETリクエストを行う(Dioを使うことでネイティブアプリでもCookieを送れる)
+    - (account.dart)FutureBuilderを用い、非同期処理(セッション確認)の結果に基づきウィジェット更新する
+    - (account.dart)レスポンスを受け取り、statusが正常(200)の場合はresponseDataを返し、ユーザー情報を画面上に表示できるようにする
+  - バックエンド
+    - (router.go)ルーターでエンドポイントを設定
+    - (sessionController.go).envファイルから"LOGIN_USER_ID_KEY"を取得し、セッションを取得するメソッドの操作
+    - (redis.go)クライアントから送られたCookie、Redisからセッションデータを取得できたら、セッションデータを返す
+    - (sessionController.go)redis.goから値を受け取れた場合、フロントエンド側にsessionValueをレスポンスとして返す
 
-USE shopmap_database;
-
-SHOW TABLES;
-
-SELECT * FROM users;
-```
 
 ## エラーや悩んだところ
 - コンテナ上のgolangからコンテナ上のMySQLへ接続できない->解決済
@@ -323,7 +348,7 @@ git push origin --force --all
 - cryptoを使った暗号化
 - セッションとは、Cookieとは
 
-## 各参考サイト
+## 各参考
 ### Frontend
 - [【Flutter】NavigationBarを使って各画面を呼び出してみる](https://qiita.com/riku333/items/0e02e576e8dfa1878fb3) -> GoRouterを使用しているので併用不可
 - [[続] go_routerでBottomNavigationBarの永続化に挑戦する(StatefulShellRoute)](https://zenn.dev/flutteruniv_dev/articles/stateful_shell_route)
@@ -356,12 +381,19 @@ git push origin --force --all
 - [init関数のふしぎ #golang](https://qiita.com/tenntenn/items/7c70e3451ac783999b4f)
 
 ## 今後の展望
-- 各所リファクタリング
-- 各技術の知識を深掘り学習(とりあえず実装しましたになっている)
+- 各所リファクタリング->何かしらのアーキテクチャを意識したディレクトリ構造
+- 各技術の知識を深掘り学習(とりあえず実装しましたになっている)->具体的には公式ドキュメントを読み進める等
 - HTTP通信ではなく、状態を保持する通信にて実装？(WebSocket、gRPC、TCP/IP？)
   - WebSocketを使用すれば、リアルタイム更新が可能
+- 直近の情報登録機能の追加
+  - その場所個々の掲示板を作成し、最新の情報等を共有する
+
+## 意識したこと
+- 知識がないため、各所からコードを参考にしたが、理解を深めるため「各ロジックの考え方メモ」に記録した
+- 
 
 ## メモ
-```
+```sh
+# Androidエミュレータの起動
 flutter run -d emulator-5554 --dart-define-from-file=dart_defines/dev.env
 ```
