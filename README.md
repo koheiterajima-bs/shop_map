@@ -274,6 +274,13 @@ SELECT * FROM users;
     - (sessionController.go).envファイルから"LOGIN_USER_ID_KEY"を取得し、セッションを取得するメソッドの操作
     - (redis.go)クライアントから送られたCookie、Redisからセッションデータを取得できたら、セッションデータを返す
     - (sessionController.go)redis.goから値を受け取れた場合、フロントエンド側にsessionValueをレスポンスとして返す
+- アカウントページ表示(フロントエンドのみ)
+  - (account.dart)FutureBuilderを用い、非同期処理(セッション)の結果に基づいてウィジェットを更新する
+  - (session.dart)snapshotの結果により、条件分岐を行う
+
+
+
+マップのフォームをログイン有無で切り替える！！！！！！(1/9ここから再開！！)
 
 
 ## エラーや悩んだところ

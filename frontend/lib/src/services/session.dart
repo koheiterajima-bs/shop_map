@@ -16,6 +16,7 @@ Future<Map<String, dynamic>?> checkSession() async {
     if (response.statusCode == 200) {
       // Dioではレスポンスのデータは自動的にデコードされる
       final responseData = response.data;
+      print("これがresponseDataの返り値$responseData");
       return responseData;
     } else {
       return null;
