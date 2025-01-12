@@ -3,7 +3,12 @@ import 'package:go_router/go_router.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shop_map/main.dart';
 import '../providers/provider.dart';
+import 'package:dio/dio.dart';
 import '../services/dio_client.dart';
+import 'package:logger/logger.dart';
+
+// Loggerインスタンスを作成
+final logger = Logger();
 
 // 新規登録表示
 class SignUpPage extends ConsumerWidget {
@@ -53,32 +58,44 @@ class SignUpPage extends ConsumerWidget {
 
                     // 正常終了時の処理
                     if (response.statusCode == 200) {
-                      // 以下のloginページ遷移を行う前にSnackBarを表示させる
-                      Future.microtask(() {
-                        ScaffoldMessenger.of(context)
-                          ..hideCurrentSnackBar() // 前の SnackBar を消す
-                          ..showSnackBar(
-                            const SnackBar(content: Text("新規登録ができました")),
-                          );
-                      });
-                      // 遷移先ページに移動
-                      Future.microtask(() {
-                        context.go('/login/account');
+                      WidgetsBinding.instance.addPostFrameCallback((_) {
+                        if (ScaffoldMessenger.maybeOf(context) != null) {
+                          ScaffoldMessenger.of(context)
+                            ..hideCurrentSnackBar() // 前のSnackBarを消す
+                            ..showSnackBar(
+                              const SnackBar(content: Text("新規登録ができました")),
+                            );
+                        }
+                        if (context.mounted) {
+                          context.go('/login/account');
+                        }
                       });
                     } else {
                       // サーバーからエラーが返ってきた場合
-                      ScaffoldMessenger.of(context)
-                        ..hideCurrentSnackBar() // 前の SnackBar を消す
-                        ..showSnackBar(
-                          SnackBar(content: Text('サーバーエラー: ${response.data}')),
-                        );
+                      WidgetsBinding.instance.addPostFrameCallback((_) {
+                        if (ScaffoldMessenger.maybeOf(context) != null) {
+                          ScaffoldMessenger.of(context)
+                            ..hideCurrentSnackBar() // 前のSnackBarを消す
+                            ..showSnackBar(
+                              SnackBar(
+                                  content: Text("サーバーエラー: ${response.data}")),
+                            );
+                        }
+                      });
                     }
-                  } catch (e) {
-                    ScaffoldMessenger.of(context)
-                      ..hideCurrentSnackBar() // 前の SnackBar を消す
-                      ..showSnackBar(
-                        SnackBar(content: Text('エラーが発生しました: $e')),
-                      );
+                  } on DioException catch (e) {
+                    logger.d("DioException: ${e.response?.data}");
+                    WidgetsBinding.instance.addPostFrameCallback((_) {
+                      if (ScaffoldMessenger.maybeOf(context) != null) {
+                        ScaffoldMessenger.of(context)
+                          ..hideCurrentSnackBar() // 前のSnackBarを消す
+                          ..showSnackBar(
+                            SnackBar(
+                                content:
+                                    Text("エラーが発生しました: ${e.response?.data}")),
+                          );
+                      }
+                    });
                   }
                 },
                 child: const Text('新規登録'),

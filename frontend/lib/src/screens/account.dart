@@ -34,18 +34,6 @@ class AccountPage extends ConsumerWidget {
                 context.go('/login');
               }
             });
-            // // 以下のloginページ遷移を行う前にSnackBarを表示させる
-            // Future.microtask(() {
-            //   ScaffoldMessenger.of(context)
-            //     ..hideCurrentSnackBar() // 前のSnackBarを消す
-            //     ..showSnackBar(
-            //       const SnackBar(content: Text('セッション確認ができませんでした')),
-            //     );
-            // });
-            // // エラーまたは未ログイン状態ならログインページにリダイレクト
-            // Future.microtask(() {
-            //   context.go('/login');
-            // });
             return const Scaffold();
           } else {
             // セッション確認ができた場合
@@ -69,39 +57,54 @@ class AccountPage extends ConsumerWidget {
                               final response = await dio.post(
                                 '${ApiConfig.baseUrl}/logout',
                               );
-
+                              // ログアウト処理
                               // 正常終了時の処理
                               if (response.statusCode == 200) {
-                                // 以下のloginページ遷移を行う前にSnackBarを表示させる
-                                Future.microtask(() {
-                                  ScaffoldMessenger.of(context)
-                                    ..hideCurrentSnackBar() // 前の SnackBar を消す
-                                    ..showSnackBar(
-                                      const SnackBar(
-                                          content: Text('ログアウトしました')),
-                                    );
-                                });
-                                // ログインページに移動
-                                Future.microtask(() {
-                                  context.go('/login');
+                                WidgetsBinding.instance
+                                    .addPostFrameCallback((_) {
+                                  if (ScaffoldMessenger.maybeOf(context) !=
+                                      null) {
+                                    ScaffoldMessenger.of(context)
+                                      ..hideCurrentSnackBar() // 前のSnackBarを消す
+                                      ..showSnackBar(
+                                        const SnackBar(
+                                            content: Text('ログアウトしました')),
+                                      );
+                                  }
+                                  if (context.mounted) {
+                                    context.go('/login');
+                                  }
                                 });
                               } else {
                                 // サーバーからエラーが返ってきた場合
-                                ScaffoldMessenger.of(context)
-                                  ..hideCurrentSnackBar() // 前の SnackBar を消す
-                                  ..showSnackBar(
-                                    SnackBar(
-                                        content:
-                                            // const Text('サーバーエラー: ${response.body}')
-                                            Text('サーバーエラー: ${response.data}')),
-                                  );
+                                WidgetsBinding.instance
+                                    .addPostFrameCallback((_) {
+                                  if (ScaffoldMessenger.maybeOf(context) !=
+                                      null) {
+                                    ScaffoldMessenger.of(context)
+                                      ..hideCurrentSnackBar() // 前のSnackBarを消す
+                                      ..showSnackBar(
+                                        SnackBar(
+                                            content: Text(
+                                                'サーバーエラー: ${response.data}')),
+                                      );
+                                  }
+                                  if (context.mounted) {
+                                    context.go('/login');
+                                  }
+                                });
                               }
                             } catch (e) {
-                              ScaffoldMessenger.of(context)
-                                ..hideCurrentSnackBar() // 前の SnackBar を消す
-                                ..showSnackBar(
-                                  SnackBar(content: Text('エラーが発生しました: $e')),
-                                );
+                              WidgetsBinding.instance.addPostFrameCallback((_) {
+                                if (ScaffoldMessenger.maybeOf(context) !=
+                                    null) {
+                                  ScaffoldMessenger.of(context)
+                                    ..hideCurrentSnackBar() // 前のSnackBarを消す
+                                    ..showSnackBar(
+                                      SnackBar(content: Text('エラーが発生しました: $e')),
+                                    );
+                                }
+                              });
                             }
                           },
                           child: const Text('ログアウト')),

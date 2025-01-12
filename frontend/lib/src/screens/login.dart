@@ -64,34 +64,44 @@ class LoginPage extends ConsumerWidget {
 
                     // 正常終了時の処理
                     if (response.statusCode == 200) {
-                      // 以下のloginページ遷移を行う前にSnackBarを表示させる
-                      Future.microtask(() {
-                        ScaffoldMessenger.of(context)
-                          ..hideCurrentSnackBar() // 前の SnackBar を消す
-                          ..showSnackBar(
-                            const SnackBar(content: Text("ログインしました")),
-                          );
-                      });
-                      // 遷移先ページに移動
-                      Future.microtask(() {
-                        context.go('/login/account');
+                      WidgetsBinding.instance.addPostFrameCallback((_) {
+                        if (ScaffoldMessenger.maybeOf(context) != null) {
+                          ScaffoldMessenger.of(context)
+                            ..hideCurrentSnackBar() // 前のSnackBarを消す
+                            ..showSnackBar(
+                              const SnackBar(content: Text("ログインしました")),
+                            );
+                        }
+                        if (context.mounted) {
+                          context.go('/login/account');
+                        }
                       });
                     } else {
                       // サーバーからエラーが返ってきた場合
-                      ScaffoldMessenger.of(context)
-                        ..hideCurrentSnackBar() // 前の SnackBar を消す
-                        ..showSnackBar(
-                          SnackBar(content: Text('サーバーエラー: ${response.data}')),
-                        );
+                      WidgetsBinding.instance.addPostFrameCallback((_) {
+                        if (ScaffoldMessenger.maybeOf(context) != null) {
+                          ScaffoldMessenger.of(context)
+                            ..hideCurrentSnackBar() // 前のSnackBarを消す
+                            ..showSnackBar(
+                              SnackBar(
+                                  content: Text("サーバーエラー: ${response.data}")),
+                            );
+                        }
+                      });
                     }
                   } on DioException catch (e) {
                     logger.d("DioException: ${e.response?.data}");
-                    ScaffoldMessenger.of(context)
-                      ..hideCurrentSnackBar() // 前の SnackBar を消す
-                      ..showSnackBar(
-                        SnackBar(
-                            content: Text('エラーが発生しました: ${e.response?.data}')),
-                      );
+                    WidgetsBinding.instance.addPostFrameCallback((_) {
+                      if (ScaffoldMessenger.maybeOf(context) != null) {
+                        ScaffoldMessenger.of(context)
+                          ..hideCurrentSnackBar() // 前のSnackBarを消す
+                          ..showSnackBar(
+                            SnackBar(
+                                content:
+                                    Text("エラーが発生しました: ${e.response?.data}")),
+                          );
+                      }
+                    });
                   }
                 },
                 child: const Text('ログイン'),
