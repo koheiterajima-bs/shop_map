@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shop_map/main.dart';
 import '../services/dio_client.dart';
@@ -9,45 +7,62 @@ import '../services/session.dart';
 
 // アカウントページ
 class AccountPage extends ConsumerWidget {
+  const AccountPage({super.key});
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return FutureBuilder<Map<String, dynamic>?>(
         future: checkSession(), // セッション確認APIを呼び出し
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return Scaffold(
+            return const Scaffold(
               body: Center(
                 child: CircularProgressIndicator(),
               ),
             );
           } else if (snapshot.hasError || snapshot.data == null) {
-            // 以下のloginページ遷移を行う前にSnackBarを表示させる
-            Future.microtask(() {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text('セッション確認ができませんでした')),
-              );
+            // セッション確認失敗時の処理
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              if (ScaffoldMessenger.maybeOf(context) != null) {
+                ScaffoldMessenger.of(context)
+                  ..hideCurrentSnackBar() // 前のSnackBarを消す
+                  ..showSnackBar(
+                    const SnackBar(content: Text('セッション確認ができませんでした')),
+                  );
+              }
+              if (context.mounted) {
+                context.go('/login');
+              }
             });
-            // エラーまたは未ログイン状態ならログインページにリダイレクト
-            Future.microtask(() {
-              context.go('/login');
-            });
-            return Scaffold();
+            // // 以下のloginページ遷移を行う前にSnackBarを表示させる
+            // Future.microtask(() {
+            //   ScaffoldMessenger.of(context)
+            //     ..hideCurrentSnackBar() // 前のSnackBarを消す
+            //     ..showSnackBar(
+            //       const SnackBar(content: Text('セッション確認ができませんでした')),
+            //     );
+            // });
+            // // エラーまたは未ログイン状態ならログインページにリダイレクト
+            // Future.microtask(() {
+            //   context.go('/login');
+            // });
+            return const Scaffold();
           } else {
-            // ユーザー情報が取得できた場合
+            // セッション確認ができた場合
             final userData = snapshot.data;
             final userId = userData?["user_id"];
 
             return Scaffold(
               body: Center(
                 child: Padding(
-                  padding: EdgeInsets.all(16.0),
+                  padding: const EdgeInsets.all(16.0),
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Text('アカウントページ'),
-                      // ここにユーザー名を表示するには？
+                      const Text('アカウントページ'),
+                      // ここにユーザー名を表示する
                       Text("ユーザー名: $userId"),
-                      SizedBox(height: 15),
+                      const SizedBox(height: 15),
                       ElevatedButton(
                           onPressed: () async {
                             try {
@@ -59,9 +74,12 @@ class AccountPage extends ConsumerWidget {
                               if (response.statusCode == 200) {
                                 // 以下のloginページ遷移を行う前にSnackBarを表示させる
                                 Future.microtask(() {
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(content: Text('ログアウトしました')),
-                                  );
+                                  ScaffoldMessenger.of(context)
+                                    ..hideCurrentSnackBar() // 前の SnackBar を消す
+                                    ..showSnackBar(
+                                      const SnackBar(
+                                          content: Text('ログアウトしました')),
+                                    );
                                 });
                                 // ログインページに移動
                                 Future.microtask(() {
@@ -69,21 +87,25 @@ class AccountPage extends ConsumerWidget {
                                 });
                               } else {
                                 // サーバーからエラーが返ってきた場合
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                      content:
-                                          // Text('サーバーエラー: ${response.body}')
-                                          Text('サーバーエラー: ${response.data}')),
-                                );
+                                ScaffoldMessenger.of(context)
+                                  ..hideCurrentSnackBar() // 前の SnackBar を消す
+                                  ..showSnackBar(
+                                    SnackBar(
+                                        content:
+                                            // const Text('サーバーエラー: ${response.body}')
+                                            Text('サーバーエラー: ${response.data}')),
+                                  );
                               }
                             } catch (e) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(content: Text('エラーが発生しました: $e')),
-                              );
+                              ScaffoldMessenger.of(context)
+                                ..hideCurrentSnackBar() // 前の SnackBar を消す
+                                ..showSnackBar(
+                                  SnackBar(content: Text('エラーが発生しました: $e')),
+                                );
                             }
                           },
-                          child: Text('ログアウト')),
-                      SizedBox(height: 15),
+                          child: const Text('ログアウト')),
+                      const SizedBox(height: 15),
                       // ElevatedButton(
                       //   onPressed: () async {
                       //     try {
@@ -115,18 +137,18 @@ class AccountPage extends ConsumerWidget {
                       //         // サーバーからエラーが返ってきた場合
                       //         ScaffoldMessenger.of(context).showSnackBar(
                       //           SnackBar(
-                      //               content: Text('サーバーエラー: ${response.body}')),
+                      //               content: const Text('サーバーエラー: ${response.body}')),
                       //         );
                       //       }
                       //     } catch (e) {
                       //       ScaffoldMessenger.of(context).showSnackBar(
-                      //         SnackBar(content: Text("エラーが発生しました: $e")),
+                      //         SnackBar(content: const Text("エラーが発生しました: $e")),
                       //       );
                       //     }
                       //   },
-                      //   child: Text("マーカー全件取得"),
+                      //   child: const Text("マーカー全件取得"),
                       // ),
-                      SizedBox(height: 15),
+                      const SizedBox(height: 15),
                       // ElevatedButton(
                       //   onPressed: () async {
                       //     try {
@@ -151,17 +173,17 @@ class AccountPage extends ConsumerWidget {
                       //         // サーバーからエラーが返ってきた場合
                       //         ScaffoldMessenger.of(context).showSnackBar(
                       //           SnackBar(
-                      //             content: Text("サーバーエラー: ${response.body}"),
+                      //             content: const Text("サーバーエラー: ${response.body}"),
                       //           ),
                       //         );
                       //       }
                       //     } catch (e) {
                       //       ScaffoldMessenger.of(context).showSnackBar(
-                      //         SnackBar(content: Text("エラーが発生しました: $e")),
+                      //         SnackBar(content: const Text("エラーが発生しました: $e")),
                       //       );
                       //     }
                       //   },
-                      //   child: Text("ユーザー情報全件取得"),
+                      //   child: const Text("ユーザー情報全件取得"),
                       // ),
                     ],
                   ),

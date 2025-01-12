@@ -126,6 +126,7 @@ SELECT * FROM users;
     - MySQLに保存されたユーザー情報の取得->完了
     - READMEにチェックボックスを付け、進捗を見やすく
     - エラーや問題をなくす
+    - ホットリロードを行うと、マップが表示されない
 
 
      linterをつける？
@@ -249,6 +250,15 @@ SELECT * FROM users;
 - db.Whereとdb.Findの違い
   - db.Find：条件なしで全てのレコードを取得したり、指定した条件で複数件を取得する際に使用
   - db.Where：条件を指定したクエリを構築し、1件または複数件を取得する際に使用
+- printについて
+  - デバッグメッセージとしてprintを使ってきたが、リリースビルドでも出力されてしまうことやログレベルによるフィルタができない
+- addPostFrameCallbackについて
+  - SnackBarを用いるためにScaffoldMessengerを用いるが、以下の注意を受ける
+  ```
+  Don't use 'BuildContext's across async gaps.
+  Try rewriting the code to not use the 'BuildContext', or guard the use with a 'mounted' check.
+  ```
+  - 今回のようなSnackBarは画面が描画された後に再描画されるものなので、確実に実行するためにaddPostFrameCallbackを用いる
 
 ### 各ロジックの考え方メモ
 - ログイン処理
@@ -277,6 +287,9 @@ SELECT * FROM users;
 - アカウントページ表示(フロントエンドのみ)
   - (account.dart)FutureBuilderを用い、非同期処理(セッション)の結果に基づいてウィジェットを更新する
   - (session.dart)snapshotの結果により、条件分岐を行う
+- マップページ入力モーダルの表示有無(ログイン時のみ表示)
+  - (provider.dart)checkSessionの状態によってモーダルの表示を行うため、Providerにて状態管理(ログイン状態は常時監視にしたいため、StreamProviderにしポーリング処理)
+  - (map.dart)非同期処理の結果に応じて、フォームの表示有無を切り替える
 
 
 
@@ -374,8 +387,9 @@ git push origin --force --all
 - [Library: スプラッシュスクリーンの実装](https://zenn.dev/web_tips/books/df8423bbb204a1/viewer/60cdda)
 - [Library: アプリアイコンの設定方法](https://zenn.dev/web_tips/books/df8423bbb204a1/viewer/054dd2)
 - [FlutterでHttpClientのDioを使用して認証情報などをクッキー（Cookie）に持たせる方法](https://qiita.com/koseidaiki/items/9a68b1406ee4b06b2c67)
+- [【2022年】おすすめのロガーパッケージ4選【Flutter】](https://zenn.dev/susatthi/articles/20220413-153500-flutter-logger)
 
-(未読)
+(読書途中)
 - [「内側」から理解する Flutter 入門](https://zenn.dev/chooyan/books/934f823764db62)
 - [仕組みから理解する Riverpod](https://zenn.dev/chooyan/books/92a0a489f68233)
 

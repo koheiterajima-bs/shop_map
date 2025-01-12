@@ -58,7 +58,7 @@ GoRouter router() {
               routes: [
                 GoRoute(
                   path: '/map',
-                  builder: (context, state) => MapPage(),
+                  builder: (context, state) => const MapPage(),
                 ),
               ],
             ),
@@ -68,17 +68,17 @@ GoRouter router() {
               routes: [
                 GoRoute(
                   path: '/login',
-                  builder: (context, state) => LoginPage(),
+                  builder: (context, state) => const LoginPage(),
                   routes: [
                     // 新規登録ページのネスト
                     GoRoute(
                       path: 'signup',
-                      builder: (context, state) => SignUpPage(),
+                      builder: (context, state) => const SignUpPage(),
                     ),
                     // accountページのネスト
                     GoRoute(
                       path: 'account',
-                      builder: (context, state) => AccountPage(),
+                      builder: (context, state) => const AccountPage(),
                     ),
                   ],
                 ),
@@ -89,7 +89,7 @@ GoRouter router() {
               routes: [
                 GoRoute(
                   path: '/howtouse',
-                  builder: (context, state) => HowToUsePage(),
+                  builder: (context, state) => const HowToUsePage(),
                 ),
               ],
             ),
