@@ -7,7 +7,6 @@ import 'package:shop_map/main.dart';
 import '../services/session.dart';
 
 // Googleマップコントローラーの状態管理
-// 非同期で実装？(後々、データベースやバックエンドから初期設定を取得する？)
 // コントローラーの状態を管理するためにStateProviderを定義
 // マップが画面に表示されるとき、GoogleMapControllerはonMapCreatedというタイミングで生成される
 final googleMapControllerProvider =
@@ -155,7 +154,7 @@ final AutoDisposeStateProvider<bool> exchangeMachineProvider =
 // バックエンドから取得してきたマーカー情報をポーリングにて取得
 final markerStreamProvider = StreamProvider<Set<Marker>>((ref) async* {
   while (true) {
-    await Future.delayed(const Duration(seconds: 5)); // 5秒ごとにリクエスト
+    await Future.delayed(const Duration(seconds: 2)); // 2秒ごとにリクエスト
     final response =
         await http.get(Uri.parse('${ApiConfig.baseUrl}/get-marker'));
     if (response.statusCode == 200) {
