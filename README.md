@@ -2,7 +2,7 @@
 
 ## 概要
 - ガチャガチャが設置している箇所をマップにて確認・登録ができるアプリ
-![動作画面](frontend/assets/images/map_sample.gif)
+<img src="frontend/assets/images/map_sample.gif" alt="動作画面" width="200">
 
 ## 作成理由
 - ミニチュア系のガチャガチャにハマり、どこにどのガチャガチャがあるのか、何台ぐらいあるのか、両替機はあるのか等を知ることができるアプリがあれば便利だと感じたため。
