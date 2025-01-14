@@ -98,6 +98,7 @@ SELECT * FROM users;
     - [x] GitHubにてPublicにするため、Google Maps APIキーを隠蔽したい(dart-define-from-file)
     - [x] READMEにチェックボックスを付け、進捗を見やすく
     - [x] エラーや問題をなくす
+    - [ ] アプリアイコンが設定されない
     - [ ] linterをつける
 
   - ログインページ
