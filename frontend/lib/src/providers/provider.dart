@@ -42,9 +42,6 @@ final currentLocationProvider = FutureProvider<LatLng>((ref) async {
   return LatLng(position.latitude, position.longitude);
 });
 
-// 現在のマーカーセットを管理するプロバイダー
-// final markersProvider = StateProvider<Set<Marker>>((ref) => {});
-
 // ログイン画面にてIDを保持するProvider
 final loginInputIDProvider = StateProvider<String>((ref) => "");
 
@@ -152,7 +149,8 @@ final AutoDisposeStateProvider<bool> exchangeMachineProvider =
 });
 
 // バックエンドから取得してきたマーカー情報をポーリングにて取得
-final markerStreamProvider = StreamProvider<Set<Marker>>((ref) async* {
+// final markerStreamProvider = StreamProvider<Set<Marker>>((ref) async* {
+final markerStreamProvider = StreamProvider<Set<CustomMarker>>((ref) async* {
   while (true) {
     await Future.delayed(const Duration(seconds: 2)); // 2秒ごとにリクエスト
     final response =
@@ -164,36 +162,57 @@ final markerStreamProvider = StreamProvider<Set<Marker>>((ref) async* {
       // location配列を取得
       final locations = responseData["location"] as List;
 
-      // マーカーリストを生成
-      final markers = locations.map((location) {
+      // カスタムマーカーリストを生成
+      final customMarkers = locations.map((location) {
+        // リスト型をjoinで文字列変換させたいが、うまくいかない、、、
+        // 最初にフロントの入力するところから見直してみる
+        // List<String> genre = [];
+        // if (location["Genre"] is List) {
+        //   genre = List<String>.from(location["Genre"]);
+        // } else {
+        //   // もしジャンルがListでなければ空リストを設定、もしくはデフォルト値を設定
+        //   logger.d("Genre is not a List: ${location["Genre"]}");
+        //   genre = ["不明なジャンル"];
+        // }
+
+        // ジャンルを結合
+        // String genreString = genre.join(" ");
+
         final details = [
-          "ジャンル: ${location["Genre"]}",
+          "${location["ShopName"]}",
+          "ジャンル:${location["Genre"]}",
+          // "ジャンル:${genre.join(" ")}",
+          // "ジャンル:$genre",
+          // "ジャンル:$genreString",
           "ガチャ台数: ${location["Unit"]}",
           "両替機の有無: ${location["ExchangeMachine"]}",
         ];
-        return Marker(
+
+        final marker = Marker(
           markerId: MarkerId(location["ID"].toString()),
           position: LatLng(
             location["Lat"] as double,
             location["Lng"] as double,
           ),
-          infoWindow: InfoWindow(
-            title: location["ShopName"],
-            snippet: details.join("\n"),
-          ),
         );
+
+        return CustomMarker(marker: marker, details: details);
       }).toSet();
 
-      yield markers;
+      yield customMarkers;
     } else {
       throw Exception("Failed to load markers");
     }
   }
 });
 
-// final markersProvider = StateProvider<Set<Marker>>((ref) {
-//   return ref.watch(markerStreamProvider);
-// });
+// markerStreamProviderがmarkerとdetailsを返せるようにするクラス
+class CustomMarker {
+  final Marker marker;
+  final List<String> details;
+
+  CustomMarker({required this.marker, required this.details});
+}
 
 // マップフォームの表示有無をセッションによって切り替える
 final sessionProvider = StreamProvider<Map<String, dynamic>?>((ref) async* {

@@ -51,8 +51,52 @@ class MapPage extends ConsumerWidget {
             ),
             myLocationEnabled: true, // 現在位置をマップ上に表示
             markers: markerStream.when(
-              data: (markers) {
-                return markers;
+              data: (customMarkers) {
+                return customMarkers.map((customMarker) {
+                  // 各CustomMarkerのmarkerとdetailsを取得
+                  final marker = customMarker.marker;
+                  final details = customMarker.details;
+
+                  // onTap付きのMarkerを返す
+                  return marker.copyWith(onTapParam: () {
+                    showDialog(
+                        context: context,
+                        builder: (BuildContext context) {
+                          return SimpleDialog(
+                            title: Text(
+                              details[0],
+                              textAlign: TextAlign.center,
+                            ),
+                            children: <Widget>[
+                              Padding(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 16.0),
+                                child: Text(details[1]),
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 16.0),
+                                child: Text(details[2]),
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 16.0),
+                                child: Text(details[3]),
+                              ),
+                              SimpleDialogOption(
+                                onPressed: () {
+                                  Navigator.pop(context);
+                                },
+                                child: const Align(
+                                  alignment: Alignment.center,
+                                  child: Text("閉じる"),
+                                ),
+                              ),
+                            ],
+                          );
+                        });
+                  });
+                }).toSet();
               },
               loading: () => {},
               error: (error, stack) => {},
@@ -70,9 +114,9 @@ class MapPage extends ConsumerWidget {
 
               // マーカーが既に存在しているかの確認
               final markersExist = markerStream.maybeWhen(
-                data: (markers) {
-                  return markers.any(
-                      (marker) => _isSameLocation(marker.position, position));
+                data: (customMarkers) {
+                  return customMarkers.any((customMarker) =>
+                      _isSameLocation(customMarker.marker.position, position));
                 },
                 orElse: () => false,
               );
