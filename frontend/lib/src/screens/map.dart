@@ -19,9 +19,6 @@ class MapPage extends ConsumerWidget {
     // 現在位置を取得
     final currentLocationAsync = ref.watch(currentLocationProvider);
 
-    // 現在のマーカーセットを取得
-    // final markers = ref.watch(markersProvider);
-
     // ボトムモーダルの状態を取得
     final bottomModalActive = ref.watch(bottomModalActiveProvider);
 
@@ -307,6 +304,8 @@ class MapPage extends ConsumerWidget {
                                                   "何系のガチャが多いか:$selectedChoices01");
                                               logger.d(
                                                   "ガチャ台数は何台か:$selectedChoices02");
+                                              logger.d(
+                                                  "アカウント名:${sessionData["user_id"]}");
 
                                               // 入力漏れがあれば通知を行う
                                               if (shopName == "") {
@@ -357,6 +356,8 @@ class MapPage extends ConsumerWidget {
                                                   'unit': selectedChoices02,
                                                   'exchange_machine':
                                                       exchangeMachine,
+                                                  'account_name':
+                                                      sessionData["user_id"],
                                                 }),
                                               );
 

@@ -43,5 +43,8 @@ func GetRouter() *gin.Engine {
 	// MySQLに保存されたユーザー情報取得
 	router.GET("/get-user-info", getUserInfo)
 
+	// セッションユーザーがMySQLに保存したマーカー取得
+	router.GET("/get-user-location", getUserLocation)
+
 	return router
 }

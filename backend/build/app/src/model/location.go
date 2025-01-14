@@ -15,6 +15,7 @@ type Location struct {
 	Genre           string  `gorm:"type:json"` // JSONとして保存
 	Unit            string  `gorm:"type:json"` // JSONとして保存
 	ExchangeMachine bool    `gorm:"not null"`
+	AccountName     string  `gorm:"not null"`
 }
 
 // AutoMigrate:データベースにテーブルを作成・更新する
@@ -23,7 +24,7 @@ func init() {
 }
 
 // 場所の登録の処理
-func RegisterLocation(lat, lng float64, shopName string, genre, unit []string, exchangeMachine bool) (*Location, error) {
+func RegisterLocation(lat, lng float64, shopName string, genre, unit []string, exchangeMachine bool, accountName string) (*Location, error) {
 	// ガチャ場所が既に存在するかどうかチェック
 	var existingLocation Location
 	if err := db.Where("lat = ? AND lng = ?", lat, lng).First(&existingLocation).Error; err != nil {
@@ -45,6 +46,7 @@ func RegisterLocation(lat, lng float64, shopName string, genre, unit []string, e
 		Genre:           toJSONString(genre), // JSON形式に変換
 		Unit:            toJSONString(unit),  // JSON形式に変換
 		ExchangeMachine: exchangeMachine,
+		AccountName:     accountName,
 	}
 
 	// ガチャ場所を登録
@@ -65,6 +67,15 @@ func toJSONString(data []string) string {
 func GetAllLocations() ([]Location, error) {
 	var locations []Location
 	if err := db.Find(&locations).Error; err != nil {
+		return nil, err
+	}
+	return locations, nil
+}
+
+// アカウント名と一致した投稿のみを取得
+func GetLocations(accountName string) ([]Location, error) {
+	var locations []Location
+	if err := db.Where("accountName = ?", accountName).Error; err != nil {
 		return nil, err
 	}
 	return locations, nil

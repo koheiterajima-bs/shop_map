@@ -109,6 +109,31 @@ class AccountPage extends ConsumerWidget {
                           },
                           child: const Text('ログアウト')),
                       const SizedBox(height: 15),
+                      ElevatedButton(
+                        onPressed: () async {
+                          try {
+                            final response = await dio.get(
+                                '${ApiConfig.baseUrl}/get-user-location',
+                                data: {
+                                  'user_id': userId,
+                                });
+
+                            // 正常終了時の処理
+                            if (response.statusCode == 200) {
+                              final responseDataUser = response.data["user_id"];
+                              logger.d(
+                                  "これがセッションと比較して取得したユーザー一覧:$responseDataUser");
+
+                              // これが取得できない！！！！(1/14ここから再開！！！！)
+                            }
+                          } catch (e) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text("エラーが発生しました: $e")),
+                            );
+                          }
+                        },
+                        child: const Text("セッションと一致するユーザーの場所取得"),
+                      ),
                       // ElevatedButton(
                       //   onPressed: () async {
                       //     try {
