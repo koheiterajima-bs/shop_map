@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -5,6 +6,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:shop_map/main.dart';
 import '../services/session.dart';
+import '../services/dio_client.dart';
 
 // Googleマップコントローラーの状態管理
 // コントローラーの状態を管理するためにStateProviderを定義
@@ -201,12 +203,12 @@ final markerStreamProvider = StreamProvider<Set<CustomMarker>>((ref) async* {
 
       yield customMarkers;
     } else {
-      throw Exception("Failed to load markers");
+      throw Exception("マーカー取得に失敗しました");
     }
   }
 });
 
-// markerStreamProviderがmarkerとdetailsを返せるようにするクラス
+// markerStreamProviderがmarkerとdetailsを返せるようにするためのデータクラス
 class CustomMarker {
   final Marker marker;
   final List<String> details;
@@ -222,3 +224,159 @@ final sessionProvider = StreamProvider<Map<String, dynamic>?>((ref) async* {
     yield await checkSession();
   }
 });
+
+// // バックエンドから取得してきた自身の場所投稿一覧を取得
+// final userLocationProvider = FutureProvider<List<UserLocation>>((ref) async {
+//   final response =
+//       await dio.get('${ApiConfig.baseUrl}/get-user-location', data: {
+//     // 'user_id': userId,
+//     'user_id': "map_sample", // 試しにハードコーディングにて行う
+//   });
+
+//   // 正常終了時の処理
+//   if (response.statusCode == 200) {
+//     // 取得した場所のデータ
+//     final responseData = response.data;
+//     logger.d("取得した場所:$responseData");
+
+//     // ここ以下が出力されない
+
+//     // location配列を取得
+//     // final locations = responseData["location"] as List<UserLocation>;
+//     // final locations = responseData["location"];
+//     // logger.d("場所の出力(出元:provider.dart):$locations");
+
+//     // logger.d("店名:${locations["ShopName"]}");
+
+//     // JSONからデータをリストに追加
+//     // final newData = locations
+//     //     .map((location) =>
+//     //         UserLocation.fromJson(location as Map<String, dynamic>))
+//     //     .toList();
+
+//     final locations =
+//         responseData["location"] as List<dynamic>; // `locations`をリストとしてキャスト
+//     logger.d("これはprovider.dartのlocationsです:$locations");
+
+//     logger.d("これはprovider.dartのlocationの0番目です:${locations[0]}");
+//     // final shopNames = locations.map((location) {
+//     //   return (location as Map<String, dynamic>)["ShopName"];
+//     // }).toList();
+
+//     // logger.d("ShopNameリスト: $shopNames");
+//     logger.d("数は？:${locations.length}");
+
+//     // 場所のリストを生成
+//     final userLocations = locations.map((location) {
+//       return location;
+//     }).toSet();
+//   } else {
+//     throw Exception("セッションユーザーの場所の取得に失敗しました");
+//   }
+// });
+
+// バックエンドから取得してきた自身の場所投稿一覧をポーリングにて取得
+final userLocationProvider = StreamProvider<List<dynamic>>((ref) async* {
+  while (true) {
+    await Future.delayed(const Duration(seconds: 2)); // 2秒ごとにリクエスト
+    final response =
+        await dio.get('${ApiConfig.baseUrl}/get-user-location', data: {
+      // 'user_id': userId,
+      'user_id': "map_sample", // 試しにハードコーディングにて行う
+    });
+
+    // 正常終了時の処理
+    if (response.statusCode == 200) {
+      // 取得した場所のデータ
+      final responseData = response.data;
+      logger.d("取得した場所:$responseData");
+
+      // ここ以下が出力されない
+
+      // location配列を取得
+      // final locations = responseData["location"] as List<UserLocation>;
+      // final locations = responseData["location"];
+      // logger.d("場所の出力(出元:provider.dart):$locations");
+
+      // logger.d("店名:${locations["ShopName"]}");
+
+      // JSONからデータをリストに追加
+      // final newData = locations
+      //     .map((location) =>
+      //         UserLocation.fromJson(location as Map<String, dynamic>))
+      //     .toList();
+
+      final locations =
+          responseData["location"] as List<dynamic>; // `locations`をリストとしてキャスト
+      logger.d("これはprovider.dartのlocationsです:$locations");
+
+      logger.d("これはprovider.dartのlocationの0番目です:${locations[0]}");
+      // final shopNames = locations.map((location) {
+      //   return (location as Map<String, dynamic>)["ShopName"];
+      // }).toList();
+
+      // logger.d("ShopNameリスト: $shopNames");
+      logger.d("数は？:${locations.length}");
+
+      // 場所のリストを生成
+      final userLocations = locations.map((location) {
+        return location;
+      }).toSet();
+
+      yield userLocations;
+    } else {
+      throw Exception("セッションユーザーの場所の取得に失敗しました");
+    }
+  }
+});
+
+// 自身の場所投稿データクラス
+class UserLocation {
+  final int id;
+  final String createdAt;
+  final String updatedAt;
+  final String deletedAt;
+  final double lat;
+  final double lng;
+  final String shopName;
+  final List<String> genre;
+  final List<String> unit;
+  final bool exchangeMachine;
+  final String accountName;
+
+  // インスタンス生成
+  UserLocation({
+    required this.id,
+    required this.createdAt,
+    required this.updatedAt,
+    required this.deletedAt,
+    required this.lat,
+    required this.lng,
+    required this.shopName,
+    required this.genre,
+    required this.unit,
+    required this.exchangeMachine,
+    required this.accountName,
+  });
+
+  // ファクトリーコンストラクタ
+  factory UserLocation.fromJson(Map<String, dynamic> json) {
+    return UserLocation(
+        id: json['id'],
+        createdAt: json['createdAt'],
+        updatedAt: json['updatedAt'],
+        deletedAt: json['deletedAt'],
+        lat: json['lat'],
+        lng: json['lng'],
+        shopName: json['shopName'],
+        genre: List<String>.from(json['genre']),
+        unit: List<String>.from(json['unit']),
+        exchangeMachine: json['exchangeMachine'],
+        accountName: json['accountName']);
+  }
+}
+
+// 取得データ
+// 取得した場所:
+// [{ID: 29, CreatedAt: 2025-01-14T09:20:23.703Z, UpdatedAt: 2025-01-14T09:20:23.703Z, DeletedAt: null, Lat: 35.68564856089414, Lng: 139.74161580204964, ShopName: 半蔵門駅, Genre: ["キャラ", "ミニチュア"], Unit: ["0〜10台"], ExchangeMachine: true, AccountName: map_sample},
+//  {ID: 30, CreatedAt: 2025-01-15T01:56:15.058Z, UpdatedAt: 2025-01-15T01:56:15.058Z, DeletedAt: null, Lat: 35.71105235635439, Lng: 139.77357901632786, ShopName: 京成上野駅, Genre: ["キャラ", "ミニチュア"], Unit: ["11〜50台"], ExchangeMachine: true, AccountName: map_sample}]

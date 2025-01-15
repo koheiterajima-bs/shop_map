@@ -4,6 +4,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shop_map/main.dart';
 import '../services/dio_client.dart';
 import '../services/session.dart';
+import '../providers/provider.dart';
+import 'package:flutter_slidable/flutter_slidable.dart';
 
 // アカウントページ
 class AccountPage extends ConsumerWidget {
@@ -11,6 +13,9 @@ class AccountPage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    // 自身の場所投稿一覧取得
+    final userLocationAsync = ref.watch(userLocationProvider);
+
     return FutureBuilder<Map<String, dynamic>?>(
         future: checkSession(), // セッション確認APIを呼び出し
         builder: (context, snapshot) {
@@ -49,7 +54,7 @@ class AccountPage extends ConsumerWidget {
                     children: [
                       const Text('アカウントページ'),
                       // ここにユーザー名を表示する
-                      Text("ユーザー名: $userId"),
+                      Text("$userIdさん、ご利用ありがとうございます。"),
                       const SizedBox(height: 15),
                       ElevatedButton(
                           onPressed: () async {
@@ -120,11 +125,13 @@ class AccountPage extends ConsumerWidget {
 
                             // 正常終了時の処理
                             if (response.statusCode == 200) {
-                              final responseDataUser = response.data["user_id"];
-                              logger.d(
-                                  "これがセッションと比較して取得したユーザー一覧:$responseDataUser");
-
-                              // これが取得できない！！！！(1/14ここから再開！！！！)
+                              final responseDataLocation =
+                                  response.data["location"];
+                              // final responseDataShopName =
+                              //     responseDataLocation["ShopName"];
+                              logger.d("これが取得したデータそのまま:$response");
+                              logger.d("取得した場所:$responseDataLocation");
+                              // logger.d("取得した店名:$responseDataShopName");
                             }
                           } catch (e) {
                             ScaffoldMessenger.of(context).showSnackBar(
@@ -134,6 +141,101 @@ class AccountPage extends ConsumerWidget {
                         },
                         child: const Text("セッションと一致するユーザーの場所取得"),
                       ),
+                      const SizedBox(height: 15),
+                      Container(
+                          height: 200,
+                          decoration: BoxDecoration(
+                            color: Colors.grey[200],
+                            border: Border.all(color: Colors.grey),
+                          ),
+                          child: userLocationAsync.when(
+                            data: (userLocations) {
+                              return ListView.builder(
+                                itemCount: userLocations.length,
+                                itemBuilder: (context, index) {
+                                  return ListTile(
+                                    title: Text("$index"),
+                                  );
+                                },
+                              );
+                            },
+                            loading: () => const Center(
+                                child: CircularProgressIndicator()),
+                            error: (error, stackTrace) =>
+                                Center(child: Text("エラー: $error")),
+                          )),
+                      // Container(
+                      //   height: 200,
+                      //   decoration: BoxDecoration(
+                      //     color: Colors.grey[200],
+                      //     border: Border.all(color: Colors.grey),
+                      //   ),
+                      // child: ListView.builder(
+                      //     itemCount: userLocation.locations.length,
+                      //     itemBuilder: (context, index) {
+                      //       return ListTile(
+                      //         title: Text("アイテム$index"),
+                      //       );
+                      //     }),
+
+                      // child: ListView.builder(
+                      //   itemCount: 20,
+                      //   itemBuilder: (context, index) {
+                      //     return Slidable(
+                      //       key: ValueKey(index),
+
+                      //       // スライド方向を設定
+                      //       direction: Axis.horizontal,
+
+                      //       // 左方向のアクション
+                      //       startActionPane: ActionPane(
+                      //         motion: const ScrollMotion(),
+                      //         children: [
+                      //           SlidableAction(
+                      //             onPressed: (context) {
+                      //               // 編集アクション
+                      //               ScaffoldMessenger.of(context)
+                      //                   .showSnackBar(
+                      //                 SnackBar(content: Text('hogeを編集しました')),
+                      //               );
+                      //             },
+                      //             backgroundColor: Colors.blue,
+                      //             foregroundColor: Colors.white,
+                      //             icon: Icons.edit,
+                      //             label: '編集',
+                      //           ),
+                      //         ],
+                      //       ),
+
+                      //       // 右方向のアクション
+                      //       endActionPane: ActionPane(
+                      //         motion: const ScrollMotion(),
+                      //         children: [
+                      //           SlidableAction(
+                      //             onPressed: (context) {
+                      //               // 削除アクション
+                      //               ScaffoldMessenger.of(context)
+                      //                   .showSnackBar(
+                      //                 SnackBar(content: Text('hogeを削除しました')),
+                      //               );
+                      //             },
+                      //             backgroundColor: Colors.red,
+                      //             foregroundColor: Colors.white,
+                      //             icon: Icons.delete,
+                      //             label: '削除',
+                      //           ),
+                      //         ],
+                      //       ),
+
+                      //       // スライド可能なリストアイテムの内容
+                      //       child: ListTile(
+                      //         title: Text("hoge"),
+                      //       ),
+                      //     );
+                      //   },
+                      // ),
+                      // ),
+
                       // ElevatedButton(
                       //   onPressed: () async {
                       //     try {

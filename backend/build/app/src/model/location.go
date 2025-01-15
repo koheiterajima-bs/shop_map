@@ -49,7 +49,7 @@ func RegisterLocation(lat, lng float64, shopName string, genre, unit []string, e
 		AccountName:     accountName,
 	}
 
-	// ガチャ場所を登録
+	// ガチャ場所を登録(レコードの作成)
 	if err := db.Create(location).Error; err != nil {
 		return nil, err
 	}
@@ -75,7 +75,7 @@ func GetAllLocations() ([]Location, error) {
 // アカウント名と一致した投稿のみを取得
 func GetLocations(accountName string) ([]Location, error) {
 	var locations []Location
-	if err := db.Where("accountName = ?", accountName).Error; err != nil {
+	if err := db.Where("account_name = ?", accountName).Find(&locations).Error; err != nil {
 		return nil, err
 	}
 	return locations, nil

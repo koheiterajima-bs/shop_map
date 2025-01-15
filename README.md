@@ -9,7 +9,7 @@
 - 現状においても、下記のようなガチャガチャアプリはあるが、上記のような機能はなく、需要があるのではないかと感じたため。
 [ガチャマニア|ガチャ専用SNS！マップから場所を探せるアプリ](https://apps.apple.com/jp/app/%E3%82%AC%E3%83%81%E3%83%A3%E3%83%9E%E3%83%8B%E3%82%A2-%E3%82%AC%E3%83%81%E3%83%A3%E5%B0%82%E7%94%A8sns-%E3%83%9E%E3%83%83%E3%83%97%E3%81%8B%E3%82%89%E5%A0%B4%E6%89%80%E3%82%92%E6%8E%A2%E3%81%9B%E3%82%8B%E3%82%A2%E3%83%97%E3%83%AA/id6446389775)
 
-## 起動方法
+## 起動方法(Web非対応)
 ```sh
 # frontend/dart_definesディレクトリを作成し、dev.envを作成(中身の記述は別途共有いたします)
 
@@ -59,6 +59,7 @@ SELECT * FROM users;
     - [x] GolangのホットリロードAirを導入
     - [x] Gormを導入し、データベース作成の記述を行い、元々ある.sqlファイルとdocker-composeファイルのバインドを削除
     - [x] Ginを使い、HTTPリクエストの記述を行う
+    - [ ] 未使用のパッケージ等ないか
 
   - ログイン(新規登録)機能
     - [x] ルーティング設定
@@ -100,6 +101,7 @@ SELECT * FROM users;
     - [x] エラーや問題をなくす
     - [ ] アプリアイコンが設定されない
     - [ ] linterをつける
+    - [ ] 未使用のパッケージ等ないか
 
   - ログインページ
     - [x] ログインフォームに入力したものをGolang側へリクエストを投げる処理実装
@@ -135,7 +137,7 @@ SELECT * FROM users;
   - 使い方ページ
     - [ ] 使い方を記載
 
-## 学んだこと
+## 学んだこと(どんなものか、どんなところが便利か)
 - MVCモデル
   - Model:ビジネスロジックを担当する部分、DBとやりとりしたり、データの登録・更新・削除を行う
   - View:表示や入出力などのUIを担当する部分
@@ -143,9 +145,36 @@ SELECT * FROM users;
 - Dockerのボリューム
   - 外部HDDのようなイメージ
   - サービス内に作成するのと、サービス外に作成するのでは何が異なるか？->サービス内だとコンテナ(サービス)削除時にボリュームも一緒に削除されてしまう
-- Gorm導入のメリット
-  - MySQLコンテナ起動時に必要なデータベースやテーブルを簡単に管理できる
-  - Gormを導入しないと、.shファイルにデータベースの初期設定を記述し、docker-composeのボリューム設定にてバインドしなくてはならない
+- Gorm
+  - メリット
+    - MySQLコンテナ起動時に必要なデータベースやテーブルを簡単に管理できる
+    - Gormを導入しないと、.shファイルにデータベースの初期設定を記述し、docker-composeのボリューム設定にてバインドしなくてはならない
+    - ORMを使うことで、直接SQLクエリを書くことなく、プログラム内でオブジェクトを操作するだけでデータベースとのやりとりができるようになる
+  - そもそもORMとは？
+    - ORM(Object-Relational Mapping)とは、オブジェクト指向プログラミング言語とリレーショナルデータベースの間のデータ変換(マッピング)を行うプログラミング技術
+  - 簡単な使い方
+  ```golang
+  // Create
+  user := User{Name: "John", Email: "John@example.com"}
+  result := db.Create(&user)
+
+  // Read
+  db.First(&user) // 最初のレコードを取得
+  db.Where("name = ?", "John").Find(&user) // 条件を指定して検索
+  var users []User // 複数のレコードを取得
+  db.Find(&users)
+
+  // Update
+  user.Name = "Jane"
+  db.Save(&user) // Saveメソッドで更新
+
+  db.Model(&user).Update("name", "John") // Updateメソッドで特定のカラムを更新
+
+  db.Model(&user).Updates(map[string]interface{}{"name": "John", "email": "john@example.com"}) // Updatesメソッドで複数のカラムを更新
+
+  // Delete
+  db.Delete(&user)
+  ```
 - Navigatorとは
   - Flutterでは、画面遷移を管理するためにNavigatorという仕組みを使う
   - GlobalKey
@@ -236,6 +265,13 @@ SELECT * FROM users;
   Try rewriting the code to not use the 'BuildContext', or guard the use with a 'mounted' check.
   ```
   - 今回のようなSnackBarは画面が描画された後に再描画されるものなので、確実に実行するためにaddPostFrameCallbackを用いる
+- ファクトリーメソッド
+  - ファクトリーメソッドは、オブジェクトの生成プロセスをカプセル化して簡潔かつ安全にインスタンスを作成するための手法
+  - 役割
+    - JSONデータのマッピング:外部から受け取ったJSONデータをDartのクラスにマッピングし、型の安全性を確保する
+    - 柔軟な初期化:JSONの値を適切なDart型に変換
+    - 簡潔なコード:オブジェクト生成時に複雑な初期化ロジックをシンプルに表現できる
+
 
 ### 各ロジックの考え方メモ
 - ログイン処理
@@ -272,7 +308,9 @@ SELECT * FROM users;
     - (map.dart)リクエスト時、セッションの情報を使い、アカウント名も送る
     - (account.dart)ボタンをクリックすると、投稿を取得
     - (account.dart)リクエストを実装し、投稿一覧を取得
-    - (account.dart)ListViewで投稿一覧を表示？(一旦ここまでできたら上出来)
+    - (account.dart)上記を参考に、Providerに取得処理を記述
+    - (account.dart)ListViewで投稿一覧を表示
+    横スワイプで削除表示、のちにクリックで編集機能をつける
 
   - バックエンド
     - (registeringLocationController.go)アカウント名を引数や構造体に追加
@@ -338,6 +376,7 @@ git push origin --force --all
 ```
 
 ## どの技術の勉強が必要か
+- [x] Gorm
 - データベース(MySQL)
 - パスワードのハッシュ化(bcrypt)
 - HTTPフレームワーク(Gin)
@@ -380,6 +419,7 @@ git push origin --force --all
 - [Library: アプリアイコンの設定方法](https://zenn.dev/web_tips/books/df8423bbb204a1/viewer/054dd2)
 - [FlutterでHttpClientのDioを使用して認証情報などをクッキー（Cookie）に持たせる方法](https://qiita.com/koseidaiki/items/9a68b1406ee4b06b2c67)
 - [【2022年】おすすめのロガーパッケージ4選【Flutter】](https://zenn.dev/susatthi/articles/20220413-153500-flutter-logger)
+- [【Flutter】リストの要素を横にスライドさせたい(iPhoneのメール的な)[2022/04/20時点]](https://zenn.dev/ryota_iwamoto/articles/slidable_list_like_iphone_mail)
 
 (読書途中)
 - [「内側」から理解する Flutter 入門](https://zenn.dev/chooyan/books/934f823764db62)
@@ -392,6 +432,7 @@ git push origin --force --all
 - [golangフレームワークginを使ってみる](https://zenn.dev/ajapa/articles/6471ac0c612fda)
 - [golangでログイン機能を作る①(bcryptでパスワード暗号化)](https://zenn.dev/ajapa/articles/5b115f53e76f3a)
 - [init関数のふしぎ #golang](https://qiita.com/tenntenn/items/7c70e3451ac783999b4f)
+- [GORMを使ってGoでデータベース操作の説明](https://qiita.com/atsutama/items/68773112208c7fc05069)
 
 ## 今後の展望
 - 各所リファクタリング->何かしらのアーキテクチャを意識したディレクトリ構造
