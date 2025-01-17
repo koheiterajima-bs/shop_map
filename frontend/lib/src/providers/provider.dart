@@ -225,110 +225,113 @@ final sessionProvider = StreamProvider<Map<String, dynamic>?>((ref) async* {
   }
 });
 
-// // バックエンドから取得してきた自身の場所投稿一覧を取得
-// final userLocationProvider = FutureProvider<List<UserLocation>>((ref) async {
-//   final response =
-//       await dio.get('${ApiConfig.baseUrl}/get-user-location', data: {
-//     // 'user_id': userId,
-//     'user_id': "map_sample", // 試しにハードコーディングにて行う
-//   });
+// ここから再開！！！！何をしたかったか、よくわからなくなってしまっている
+// バックエンドから取得してきた自身の場所投稿一覧を取得
+final userLocationProvider = FutureProvider<List<UserLocation>>((ref) async {
+  final response =
+      await dio.get('${ApiConfig.baseUrl}/get-user-location', data: {
+    // 'user_id': userId,
+    'user_id': "map_sample", // 試しにハードコーディングにて行う
+  });
 
-//   // 正常終了時の処理
-//   if (response.statusCode == 200) {
-//     // 取得した場所のデータ
-//     final responseData = response.data;
-//     logger.d("取得した場所:$responseData");
+  // 正常終了時の処理
+  if (response.statusCode == 200) {
+    // 取得した場所のデータ
+    final responseData = response.data;
+    logger.d("取得した場所:$responseData");
 
-//     // ここ以下が出力されない
+    // ここ以下が出力されない
 
-//     // location配列を取得
-//     // final locations = responseData["location"] as List<UserLocation>;
-//     // final locations = responseData["location"];
-//     // logger.d("場所の出力(出元:provider.dart):$locations");
+    // location配列を取得
+    // final locations = responseData["location"] as List<UserLocation>;
+    // final locations = responseData["location"];
+    // logger.d("場所の出力(出元:provider.dart):$locations");
 
-//     // logger.d("店名:${locations["ShopName"]}");
+    // logger.d("店名:${locations["ShopName"]}");
 
-//     // JSONからデータをリストに追加
-//     // final newData = locations
-//     //     .map((location) =>
-//     //         UserLocation.fromJson(location as Map<String, dynamic>))
-//     //     .toList();
+    // JSONからデータをリストに追加
+    // final newData = locations
+    //     .map((location) =>
+    //         UserLocation.fromJson(location as Map<String, dynamic>))
+    //     .toList();
 
-//     final locations =
-//         responseData["location"] as List<dynamic>; // `locations`をリストとしてキャスト
-//     logger.d("これはprovider.dartのlocationsです:$locations");
+    final locations =
+        responseData["location"] as List<dynamic>; // `locations`をリストとしてキャスト
+    logger.d("これはprovider.dartのlocationsです:$locations");
 
-//     logger.d("これはprovider.dartのlocationの0番目です:${locations[0]}");
-//     // final shopNames = locations.map((location) {
-//     //   return (location as Map<String, dynamic>)["ShopName"];
-//     // }).toList();
+    logger.d("これはprovider.dartのlocationの0番目です:${locations[0]}");
+    // final shopNames = locations.map((location) {
+    //   return (location as Map<String, dynamic>)["ShopName"];
+    // }).toList();
 
-//     // logger.d("ShopNameリスト: $shopNames");
-//     logger.d("数は？:${locations.length}");
+    // logger.d("ShopNameリスト: $shopNames");
+    logger.d("数は？:${locations.length}");
 
-//     // 場所のリストを生成
-//     final userLocations = locations.map((location) {
-//       return location;
-//     }).toSet();
-//   } else {
-//     throw Exception("セッションユーザーの場所の取得に失敗しました");
-//   }
-// });
+    // 場所のリストを生成
+    final userLocations = locations.map((location) {
+      return UserLocation.fromJson(location as Map<String, dynamic>);
+    }).toList();
 
-// バックエンドから取得してきた自身の場所投稿一覧をポーリングにて取得
-final userLocationProvider = StreamProvider<List<dynamic>>((ref) async* {
-  while (true) {
-    await Future.delayed(const Duration(seconds: 2)); // 2秒ごとにリクエスト
-    final response =
-        await dio.get('${ApiConfig.baseUrl}/get-user-location', data: {
-      // 'user_id': userId,
-      'user_id': "map_sample", // 試しにハードコーディングにて行う
-    });
-
-    // 正常終了時の処理
-    if (response.statusCode == 200) {
-      // 取得した場所のデータ
-      final responseData = response.data;
-      logger.d("取得した場所:$responseData");
-
-      // ここ以下が出力されない
-
-      // location配列を取得
-      // final locations = responseData["location"] as List<UserLocation>;
-      // final locations = responseData["location"];
-      // logger.d("場所の出力(出元:provider.dart):$locations");
-
-      // logger.d("店名:${locations["ShopName"]}");
-
-      // JSONからデータをリストに追加
-      // final newData = locations
-      //     .map((location) =>
-      //         UserLocation.fromJson(location as Map<String, dynamic>))
-      //     .toList();
-
-      final locations =
-          responseData["location"] as List<dynamic>; // `locations`をリストとしてキャスト
-      logger.d("これはprovider.dartのlocationsです:$locations");
-
-      logger.d("これはprovider.dartのlocationの0番目です:${locations[0]}");
-      // final shopNames = locations.map((location) {
-      //   return (location as Map<String, dynamic>)["ShopName"];
-      // }).toList();
-
-      // logger.d("ShopNameリスト: $shopNames");
-      logger.d("数は？:${locations.length}");
-
-      // 場所のリストを生成
-      final userLocations = locations.map((location) {
-        return location;
-      }).toSet();
-
-      yield userLocations;
-    } else {
-      throw Exception("セッションユーザーの場所の取得に失敗しました");
-    }
+    return userLocations;
+  } else {
+    throw Exception("セッションユーザーの場所の取得に失敗しました");
   }
 });
+
+// // バックエンドから取得してきた自身の場所投稿一覧をポーリングにて取得
+// final userLocationProvider = StreamProvider<List<dynamic>>((ref) async* {
+//   while (true) {
+//     await Future.delayed(const Duration(seconds: 2)); // 2秒ごとにリクエスト
+//     final response =
+//         await dio.get('${ApiConfig.baseUrl}/get-user-location', data: {
+//       // 'user_id': userId,
+//       'user_id': "map_sample", // 試しにハードコーディングにて行う
+//     });
+
+//     // 正常終了時の処理
+//     if (response.statusCode == 200) {
+//       // 取得した場所のデータ
+//       final responseData = response.data;
+//       logger.d("取得した場所:$responseData");
+
+//       // ここ以下が出力されない
+
+//       // location配列を取得
+//       // final locations = responseData["location"] as List<UserLocation>;
+//       // final locations = responseData["location"];
+//       // logger.d("場所の出力(出元:provider.dart):$locations");
+
+//       // logger.d("店名:${locations["ShopName"]}");
+
+//       // JSONからデータをリストに追加
+//       // final newData = locations
+//       //     .map((location) =>
+//       //         UserLocation.fromJson(location as Map<String, dynamic>))
+//       //     .toList();
+
+//       final locations =
+//           responseData["location"] as List<dynamic>; // `locations`をリストとしてキャスト
+//       logger.d("これはprovider.dartのlocationsです:$locations");
+
+//       logger.d("これはprovider.dartのlocationの0番目です:${locations[0]}");
+//       // final shopNames = locations.map((location) {
+//       //   return (location as Map<String, dynamic>)["ShopName"];
+//       // }).toList();
+
+//       // logger.d("ShopNameリスト: $shopNames");
+//       logger.d("数は？:${locations.length}");
+
+//       // 場所のリストを生成
+//       final userLocations = locations.map((location) {
+//         return location;
+//       }).toSet();
+
+//       yield userLocations;
+//     } else {
+//       throw Exception("セッションユーザーの場所の取得に失敗しました");
+//     }
+//   }
+// });
 
 // 自身の場所投稿データクラス
 class UserLocation {
